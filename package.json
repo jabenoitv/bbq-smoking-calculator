@@ -1,0 +1,14 @@
+{
+  "name": "jabenoitv-cashclaw",
+  "version": "1.0.0",
+  "description": "CashClaw autonomous work agent setup for jabenoitv",
+  "private": true,
+  "scripts": {
+    "setup": "cashclaw",
+    "start": "cashclaw"
+  },
+  "dependencies": {
+    "cashclaw-agent": "^0.1.0",
+    "moltlaunch": "latest"
+  }
+}
