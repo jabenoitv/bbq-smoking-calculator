@@ -1,7 +1,6 @@
 [build]
   base = "bbq-calculator"
-  command = "npm run build"
-  publish = "dist"
+  publish = "."
 
 [[redirects]]
   from = "/*"
@@ -9,5 +8,4 @@
   status = 200
 
 [dev]
-  command = "npm run dev"
   port = 3000
