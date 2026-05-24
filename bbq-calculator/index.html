@@ -634,6 +634,289 @@
             }
         }
 
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            background: #f5f5f5;
+            padding: 6px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 8px;
+            background: transparent;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #333;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Active Cures Tracking */
+        .active-cures-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            background: #f9f9f9;
+            border-radius: 12px;
+            border: 2px dashed #ddd;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .active-cure-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 5px solid #c2185b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .active-cure-card.ready {
+            border-left-color: #4caf50;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .active-cure-card.almost {
+            border-left-color: #ff9800;
+        }
+
+        .cure-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .cure-card-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .cure-card-date {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .cure-progress {
+            margin: 12px 0;
+        }
+
+        .cure-progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .cure-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #c2185b 0%, #e91e63 100%);
+            transition: width 0.3s ease;
+        }
+
+        .cure-progress-fill.ready {
+            background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+        }
+
+        .cure-countdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+
+        .cure-days-left {
+            font-weight: 700;
+            color: #c2185b;
+            font-size: 1.4em;
+        }
+
+        .cure-days-left.ready {
+            color: #4caf50;
+        }
+
+        .cure-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .cure-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.85em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .cure-action-btn.complete {
+            background: #4caf50;
+            color: white;
+        }
+
+        .cure-action-btn.delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .cure-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Gadgets */
+        .gadgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gadget-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-top: 4px solid #667eea;
+        }
+
+        .gadget-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .gadget-converter input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+
+        .gadget-result {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.95em;
+        }
+
+        .gadget-table {
+            width: 100%;
+            font-size: 0.9em;
+            border-collapse: collapse;
+        }
+
+        .gadget-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .gadget-table td:first-child {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .gadget-table td:last-child {
+            color: #667eea;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .start-cure-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #c2185b 0%, #e91e63 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .start-cure-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(194, 24, 91, 0.3);
+        }
+
+        .rub-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .rub-info ul {
+            margin-top: 5px;
+            padding-left: 20px;
+        }
+
+        .rub-info li {
+            margin: 4px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .tab-btn {
+                font-size: 0.8em;
+                min-width: 80px;
+                padding: 10px 6px;
+            }
+            .gadgets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .history-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -686,64 +969,212 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔥 BBQ Smoking Calculator</h1>
-        <p class="subtitle">Calcula tiempo y temperatura para tu ahumado perfecto</p>
+        <h1>🔥 BBQ Master</h1>
+        <p class="subtitle">Calculadora completa para parrilleros</p>
 
-        <div class="input-section">
-            <div class="form-group">
-                <label for="meatType">Tipo de Carne</label>
-                <select id="meatType">
-                    <optgroup label="Vacuno">
-                        <option value="tapapecho">Tapapecho (Brisket)</option>
-                        <option value="plateada">Plateada</option>
-                        <option value="punta_ganso">Punta de Ganso (Picaña)</option>
-                        <option value="asado_tira">Asado de Tira (Short Ribs)</option>
-                    </optgroup>
-                    <optgroup label="Cerdo">
-                        <option value="paleta_cerdo">Paleta de Cerdo (Pork Shoulder)</option>
-                        <option value="costillar_cerdo">Costillar de Cerdo (Pork Ribs)</option>
-                    </optgroup>
-                    <optgroup label="Ave">
-                        <option value="pollo_entero">Pollo Entero (Whole Chicken)</option>
-                        <option value="pavo_entero">Pavo Entero (Whole Turkey)</option>
-                    </optgroup>
-                    <optgroup label="Curados">
-                        <option value="panceta">Panceta / Bacon (Pork Belly)</option>
-                        <option value="pastrami">Pastrami (de Tapapecho)</option>
-                        <option value="corned_beef">Corned Beef (de Tapapecho)</option>
-                        <option value="beef_jerky">Beef Jerky (Carne Seca)</option>
-                    </optgroup>
-                </select>
-            </div>
+        <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="ahumado" onclick="switchTab('ahumado')">🔥 Ahumado</button>
+            <button class="tab-btn" data-tab="curados" onclick="switchTab('curados')">🥓 Curados</button>
+            <button class="tab-btn" data-tab="mis-curados" onclick="switchTab('mis-curados')">📅 Mis Curados <span id="activeCuresBadge" style="display:none; background:#c2185b; color:white; border-radius:10px; padding:2px 6px; font-size:0.7em; margin-left:3px;"></span></button>
+            <button class="tab-btn" data-tab="gadgets" onclick="switchTab('gadgets')">🔧 Gadgets</button>
+        </nav>
 
-            <div class="form-group">
-                <label for="weight">Peso</label>
-                <div class="weight-input-group">
-                    <input id="weight" type="number" value="3.0" min="0.1" step="0.1">
-                    <button class="unit-toggle" onclick="calculator.toggleWeightUnit()" id="weightUnitBtn">kg</button>
+        <!-- TAB: AHUMADO -->
+        <div class="tab-content active" id="tab-ahumado">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="meatType">Tipo de Carne</label>
+                    <select id="meatType">
+                        <optgroup label="🐄 Vacuno">
+                            <option value="tapapecho">Tapapecho (Brisket)</option>
+                            <option value="plateada">Plateada</option>
+                            <option value="punta_ganso">Punta de Ganso (Picaña)</option>
+                            <option value="asado_tira">Asado de Tira (Short Ribs)</option>
+                        </optgroup>
+                        <optgroup label="🐷 Cerdo">
+                            <option value="paleta_cerdo">Paleta de Cerdo (Pork Shoulder)</option>
+                            <option value="costillar_cerdo">Costillar de Cerdo (Pork Ribs)</option>
+                        </optgroup>
+                        <optgroup label="🐔 Ave">
+                            <option value="pollo_entero">Pollo Entero (Whole Chicken)</option>
+                            <option value="pavo_entero">Pavo Entero (Whole Turkey)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Peso</label>
+                    <div class="weight-input-group">
+                        <input id="weight" type="number" value="3.0" min="0.1" step="0.1">
+                        <button class="unit-toggle" onclick="calculator.toggleWeightUnit()" id="weightUnitBtn">kg</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="smokingTemp">Temperatura del Ahumador</label>
+                    <div class="temp-input-group">
+                        <input id="smokingTemp" type="number" value="110" min="65" max="180" step="1">
+                        <button class="unit-toggle" onclick="calculator.toggleTempUnit()" id="tempUnitBtn">°C</button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="calculate-btn" onclick="calculator.calculate()">Calcular</button>
+                    <button class="secondary-btn" onclick="stateManager.showHistory()">📋 Historial</button>
+                    <button class="secondary-btn" onclick="stateManager.exportData()">📥 Exportar</button>
+                    <button class="secondary-btn" onclick="stateManager.importData()">📤 Importar</button>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="smokingTemp">Temperatura del Ahumador</label>
-                <div class="temp-input-group">
-                    <input id="smokingTemp" type="number" value="110" min="65" max="180" step="1">
-                    <button class="unit-toggle" onclick="calculator.toggleTempUnit()" id="tempUnitBtn">°C</button>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="calculate-btn" onclick="calculator.calculate()">Calcular</button>
-                <button class="secondary-btn" onclick="stateManager.showHistory()">📋 Historial</button>
-                <button class="secondary-btn" onclick="stateManager.exportData()">📥 Exportar</button>
-                <button class="secondary-btn" onclick="stateManager.importData()">📤 Importar</button>
+            <div id="results" class="results-section"></div>
+            <div id="history" style="display:none; margin-bottom: 30px;">
+                <h3>Recetas Guardadas</h3>
+                <div class="history-list" id="historyList"></div>
             </div>
         </div>
 
-        <div id="results" class="results-section"></div>
-        <div id="history" style="display:none; margin-bottom: 30px;">
-            <h3>Recetas Guardadas</h3>
-            <div class="history-list" id="historyList"></div>
+        <!-- TAB: CURADOS -->
+        <div class="tab-content" id="tab-curados">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="cureType">Tipo de Curado</label>
+                    <select id="cureType" onchange="updateCureDefaults()">
+                        <option value="bacon">🥓 Bacon (Pork Belly)</option>
+                        <option value="pastrami">🥩 Pastrami (Tapapecho curado + ahumado)</option>
+                        <option value="corned_beef">🥩 Corned Beef (Tapapecho en salmuera)</option>
+                        <option value="beef_jerky">🥩 Beef Jerky (Carne seca)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cureWeight">Peso de la Carne</label>
+                    <div class="weight-input-group">
+                        <input id="cureWeight" type="number" value="2.0" min="0.1" step="0.1">
+                        <span style="padding:10px; font-weight:600; color:#666;">kg</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cureThickness">Grosor de la Carne (cm)</label>
+                    <input id="cureThickness" type="number" value="3.0" min="0.3" max="15" step="0.5">
+                </div>
+
+                <div class="button-group">
+                    <button class="calculate-btn" onclick="calculateCure()">Calcular Cura</button>
+                </div>
+            </div>
+
+            <div id="cureResults" class="results-section"></div>
+        </div>
+
+        <!-- TAB: MIS CURADOS (Tracker) -->
+        <div class="tab-content" id="tab-mis-curados">
+            <h2 style="margin-bottom:20px; color:#333;">📅 Mis Curados Activos</h2>
+            <p style="color:#666; margin-bottom:20px;">Seguimiento de tus curados en proceso. Te muestra los días restantes hasta que estén listos.</p>
+            <div id="activeCuresList" class="active-cures-list"></div>
+            <div id="completedCures" style="margin-top:30px;"></div>
+        </div>
+
+        <!-- TAB: GADGETS -->
+        <div class="tab-content" id="tab-gadgets">
+            <h2 style="margin-bottom:5px; color:#333;">🔧 Gadgets del Parrillero</h2>
+            <p style="color:#666; margin-bottom:20px;">Herramientas útiles para tu BBQ.</p>
+
+            <div class="gadgets-grid">
+                <!-- Convertidor de temperatura -->
+                <div class="gadget-card">
+                    <h3>🌡️ Convertidor de Temperatura</h3>
+                    <div class="gadget-converter">
+                        <label>Celsius (°C)</label>
+                        <input type="number" id="tempC" value="107" oninput="convertTemp('c')">
+                        <label>Fahrenheit (°F)</label>
+                        <input type="number" id="tempF" value="225" oninput="convertTemp('f')">
+                    </div>
+                </div>
+
+                <!-- Convertidor de peso -->
+                <div class="gadget-card">
+                    <h3>⚖️ Convertidor de Peso</h3>
+                    <div class="gadget-converter">
+                        <label>Kilogramos (kg)</label>
+                        <input type="number" id="weightKg" value="1" oninput="convertWeight('kg')">
+                        <label>Libras (lbs)</label>
+                        <input type="number" id="weightLbs" value="2.2" oninput="convertWeight('lbs')">
+                    </div>
+                </div>
+
+                <!-- Temperaturas internas seguras -->
+                <div class="gadget-card">
+                    <h3>🌡️ Temperaturas Internas Seguras (USDA)</h3>
+                    <table class="gadget-table">
+                        <tr><td>Aves (pollo, pavo)</td><td>74°C / 165°F</td></tr>
+                        <tr><td>Cerdo molido</td><td>71°C / 160°F</td></tr>
+                        <tr><td>Cerdo entero (medio)</td><td>63°C / 145°F</td></tr>
+                        <tr><td>Vacuno medio raro</td><td>52°C / 125°F</td></tr>
+                        <tr><td>Vacuno medio</td><td>57°C / 135°F</td></tr>
+                        <tr><td>Vacuno bien cocido</td><td>71°C / 160°F</td></tr>
+                        <tr><td>Brisket/Pulled Pork (fall-apart)</td><td>93-96°C / 200-205°F</td></tr>
+                        <tr><td>Costillas (fall-off-bone)</td><td>88-93°C / 190-200°F</td></tr>
+                    </table>
+                </div>
+
+                <!-- Maderas por carne -->
+                <div class="gadget-card">
+                    <h3>🪵 Madera Recomendada</h3>
+                    <table class="gadget-table">
+                        <tr><td>Brisket / Beef</td><td>Roble, Nogal, Mezquite</td></tr>
+                        <tr><td>Pork Shoulder / Bacon</td><td>Manzano, Cerezo, Nogal</td></tr>
+                        <tr><td>Costillas Cerdo</td><td>Cerezo, Manzano, Hickory</td></tr>
+                        <tr><td>Pollo / Pavo</td><td>Manzano, Cerezo, Pera</td></tr>
+                        <tr><td>Pescado</td><td>Aliso, Manzano</td></tr>
+                        <tr><td>Pastrami</td><td>Nogal, Roble</td></tr>
+                    </table>
+                </div>
+
+                <!-- Calculadora de rub -->
+                <div class="gadget-card">
+                    <h3>🧂 Calculadora de Rub</h3>
+                    <div class="gadget-converter">
+                        <label>Peso de carne (kg)</label>
+                        <input type="number" id="rubWeight" value="2" oninput="calculateRub()">
+                        <div class="gadget-result" id="rubResult"></div>
+                    </div>
+                </div>
+
+                <!-- Tiempos de cocción rápidos -->
+                <div class="gadget-card">
+                    <h3>⏱️ Tiempos Rápidos de Referencia</h3>
+                    <table class="gadget-table">
+                        <tr><td>Brisket/Tapapecho</td><td>~1.5 hrs/lb @ 107°C</td></tr>
+                        <tr><td>Pork Shoulder/Paleta</td><td>~1.5 hrs/lb @ 107°C</td></tr>
+                        <tr><td>Costillas</td><td>3-2-1 método (6h total)</td></tr>
+                        <tr><td>Pollo entero</td><td>~3-4h @ 121°C</td></tr>
+                        <tr><td>Pavo entero</td><td>~30min/kg @ 121°C</td></tr>
+                        <tr><td>Picaña ahumada</td><td>~2h hasta 60°C interna</td></tr>
+                    </table>
+                </div>
+
+                <!-- Método 3-2-1 -->
+                <div class="gadget-card">
+                    <h3>🍖 Método 3-2-1 (Costillas)</h3>
+                    <div class="gadget-result">
+                        <p><strong>3 horas:</strong> Ahumado a 107°C, expuesto</p>
+                        <p style="margin-top:8px;"><strong>2 horas:</strong> Envueltas en papel aluminio con líquido (juego de manzana, mantequilla, azúcar)</p>
+                        <p style="margin-top:8px;"><strong>1 hora:</strong> Sin envolver, con salsa BBQ pincelada</p>
+                        <p style="margin-top:8px; color:#999; font-size:0.85em;">Variante 2-2-1 para costillas más pequeñas (St Louis style)</p>
+                    </div>
+                </div>
+
+                <!-- Equilibrium Cure rápido -->
+                <div class="gadget-card">
+                    <h3>📐 Cura Rápida (Equilibrium)</h3>
+                    <div class="gadget-converter">
+                        <label>Peso de carne (kg)</label>
+                        <input type="number" id="quickCureWeight" value="1" oninput="quickCureCalc()">
+                        <div class="gadget-result" id="quickCureResult"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -874,42 +1305,6 @@
                         optimalTempC: 74,
                         holdingMin: 20,
                         description: 'Pavo para fiestas. Considerar inyección de líquidos.'
-                    },
-                    panceta: {
-                        name: 'Panceta / Bacon (Pork Belly)',
-                        timePerKg: 1.5,
-                        minTempC: 65,
-                        optimalTempC: 68,
-                        holdingMin: 0,
-                        description: 'Pork belly para hacer bacon casero. Curado previo necesario.',
-                        needsCure: 'bacon'
-                    },
-                    pastrami: {
-                        name: 'Pastrami (de Tapapecho)',
-                        timePerKg: 2.0,
-                        minTempC: 88,
-                        optimalTempC: 93,
-                        holdingMin: 30,
-                        description: 'Tapapecho curado + rub de coriandro y pimienta + ahumado.',
-                        needsCure: 'pastrami'
-                    },
-                    corned_beef: {
-                        name: 'Corned Beef (de Tapapecho)',
-                        timePerKg: 1.5,
-                        minTempC: 88,
-                        optimalTempC: 93,
-                        holdingMin: 0,
-                        description: 'Tapapecho en salmuera + hervido (no ahumado). El corned beef tradicional.',
-                        needsCure: 'corned_beef'
-                    },
-                    beef_jerky: {
-                        name: 'Beef Jerky (Carne Seca)',
-                        timePerKg: 0.0,
-                        minTempC: 71,
-                        optimalTempC: 71,
-                        holdingMin: 0,
-                        description: 'Tiras finas de carne magra, marinadas y deshidratadas.',
-                        needsCure: 'beef_jerky'
                     }
                 };
             }
@@ -1130,7 +1525,7 @@
                     errors.weight = 'Peso debe ser entre 0.1 y 100';
                 }
 
-                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero', 'panceta', 'pastrami', 'corned_beef', 'beef_jerky'];
+                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero'];
                 if (!inputs.meatType || !validTypes.includes(inputs.meatType)) {
                     errors.meatType = 'Tipo de carne inválido';
                 }
@@ -1201,18 +1596,57 @@
             load() {
                 try {
                     const stored = localStorage.getItem(this.storageKey);
-                    return stored ? JSON.parse(stored) : {
-                        version: '1.0',
-                        recipes: [],
-                        userPreferences: {
+                    const parsed = stored ? JSON.parse(stored) : {};
+                    return {
+                        version: '2.0',
+                        recipes: parsed.recipes || [],
+                        activeCures: parsed.activeCures || [],
+                        userPreferences: parsed.userPreferences || {
                             defaultTempUnit: 'C',
                             defaultWeightUnit: 'kg'
                         }
                     };
                 } catch (err) {
                     console.error('Error cargando estado:', err);
-                    return { recipes: [], userPreferences: {} };
+                    return { recipes: [], activeCures: [], userPreferences: {} };
                 }
+            }
+
+            /**
+             * Agregar curado activo para tracking
+             */
+            addActiveCure(cureData) {
+                if (!this.state.activeCures) this.state.activeCures = [];
+                this.state.activeCures.push(cureData);
+                this.save();
+                this.emit('active-cure-added', cureData);
+            }
+
+            /**
+             * Obtener curados activos
+             */
+            getActiveCures() {
+                return this.state.activeCures || [];
+            }
+
+            /**
+             * Marcar curado como completado
+             */
+            markCureComplete(id) {
+                const cure = (this.state.activeCures || []).find(c => c.id === id);
+                if (cure) {
+                    cure.completed = true;
+                    cure.completedDate = new Date().toISOString();
+                    this.save();
+                }
+            }
+
+            /**
+             * Eliminar curado activo
+             */
+            deleteActiveCure(id) {
+                this.state.activeCures = (this.state.activeCures || []).filter(c => c.id !== id);
+                this.save();
             }
 
             /**
@@ -1794,7 +2228,6 @@
                     <button class="action-btn" onclick="location.href='#'">🔄 Nueva Consulta</button>
                 </div>
 
-                ${result.formula.needsCure ? renderCureSection(result.weightKg, result.formula.needsCure) : ''}
             `;
 
             resultsDiv.innerHTML = resultsHTML;
@@ -1802,29 +2235,309 @@
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function renderCureSection(weightKg, cureType) {
+        // ================================================================
+        // TABS NAVIGATION
+        // ================================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            if (tabName === 'mis-curados') {
+                renderActiveCures();
+            }
+        }
+
+        // ================================================================
+        // TAB CURADOS - Cálculo directo
+        // ================================================================
+        let lastCureResult = null;
+
+        function updateCureDefaults() {
+            const cureType = document.getElementById('cureType').value;
             const profile = cureCalc.getCureProfiles()[cureType];
-            const defaultThickness = profile ? profile.defaultThickness : 3.0;
-            const cure = cureCalc.calculate(cureType, weightKg, defaultThickness, { includeSugar: true });
-            return cureCalc.renderRecipe(cure);
+            if (profile) {
+                document.getElementById('cureThickness').value = profile.defaultThickness;
+            }
+        }
+
+        function calculateCure() {
+            const cureType = document.getElementById('cureType').value;
+            const weight = parseFloat(document.getElementById('cureWeight').value);
+            const thickness = parseFloat(document.getElementById('cureThickness').value);
+
+            if (!weight || weight <= 0) {
+                showToast('Ingresa un peso válido', 'error');
+                return;
+            }
+
+            try {
+                const cure = cureCalc.calculate(cureType, weight, thickness, { includeSugar: true });
+                lastCureResult = cure;
+
+                const resultsDiv = document.getElementById('cureResults');
+                resultsDiv.innerHTML = cureCalc.renderRecipe(cure) +
+                    `<div class="actions-section">
+                        <button class="start-cure-btn" onclick="startCureTracking()">📅 Iniciar Curado (con contador)</button>
+                    </div>`;
+                resultsDiv.classList.add('show');
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+                showToast(`Error: ${err.message}`, 'error');
+            }
         }
 
         function recalculateCure() {
             const thicknessInput = document.getElementById('thicknessInput');
             const sugarCheckbox = document.getElementById('includeSugar');
-            if (!thicknessInput || !lastResult) return;
+            if (!thicknessInput || !lastCureResult) return;
 
-            const cureType = lastResult.formula.needsCure;
+            const cureType = lastCureResult.type;
             const profile = cureCalc.getCureProfiles()[cureType];
             const thickness = parseFloat(thicknessInput.value) || profile.defaultThickness;
             const includeSugar = sugarCheckbox ? sugarCheckbox.checked : true;
 
-            const cure = cureCalc.calculate(cureType, lastResult.weightKg, thickness, { includeSugar });
+            const cure = cureCalc.calculate(cureType, lastCureResult.weightKg, thickness, { includeSugar });
+            lastCureResult = cure;
+
             const cureContainer = document.querySelector('.bacon-cure-section');
             if (cureContainer) {
                 cureContainer.outerHTML = cureCalc.renderRecipe(cure);
             }
         }
+
+        // ================================================================
+        // TAB MIS CURADOS - Tracker con contador
+        // ================================================================
+        function startCureTracking() {
+            if (!lastCureResult) {
+                showToast('Calcula primero una receta de cura', 'warning');
+                return;
+            }
+
+            const cure = lastCureResult;
+            const activeCure = {
+                id: Date.now(),
+                type: cure.type,
+                typeName: cure.profile.name,
+                weightKg: cure.weightKg,
+                thicknessCm: cure.thicknessCm,
+                startDate: new Date().toISOString(),
+                durationDays: cure.cureTime.unit === 'días' ? cure.cureTime.recommended : cure.cureTime.recommended / 24,
+                cureTime: cure.cureTime,
+                ingredients: {
+                    saltGrams: cure.saltGrams,
+                    pinkSaltGrams: cure.pinkSaltGrams,
+                    sugarGrams: cure.sugarGrams,
+                    waterLiters: cure.waterLiters
+                },
+                completed: false
+            };
+
+            stateManager.addActiveCure(activeCure);
+            showToast(`✓ Curado iniciado: ${cure.profile.name}`, 'success');
+            switchTab('mis-curados');
+        }
+
+        function renderActiveCures() {
+            const cures = stateManager.getActiveCures();
+            const listDiv = document.getElementById('activeCuresList');
+            const completedDiv = document.getElementById('completedCures');
+
+            const active = cures.filter(c => !c.completed);
+            const completed = cures.filter(c => c.completed);
+
+            // Actualizar badge
+            const badge = document.getElementById('activeCuresBadge');
+            if (active.length > 0) {
+                badge.textContent = active.length;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (active.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 No hay curados activos</h3>
+                        <p>Ve a la pestaña "🥓 Curados" para calcular y empezar un curado.</p>
+                    </div>
+                `;
+            } else {
+                listDiv.innerHTML = active.map(c => renderActiveCureCard(c)).join('');
+            }
+
+            if (completed.length > 0) {
+                completedDiv.innerHTML = `
+                    <h3 style="color:#666; margin-bottom:15px;">✅ Curados Completados</h3>
+                    <div class="active-cures-list" style="opacity:0.7;">
+                        ${completed.slice(-5).reverse().map(c => renderActiveCureCard(c)).join('')}
+                    </div>
+                `;
+            } else {
+                completedDiv.innerHTML = '';
+            }
+        }
+
+        function renderActiveCureCard(cure) {
+            const startDate = new Date(cure.startDate);
+            const now = new Date();
+            const elapsedMs = now - startDate;
+            const elapsedDays = elapsedMs / (1000 * 60 * 60 * 24);
+            const remainingDays = cure.durationDays - elapsedDays;
+            const progressPct = Math.min(100, Math.max(0, (elapsedDays / cure.durationDays) * 100));
+
+            const isReady = remainingDays <= 0 && !cure.completed;
+            const isAlmost = remainingDays > 0 && remainingDays < 1;
+
+            let cardClass = 'active-cure-card';
+            if (cure.completed) cardClass += ' completed';
+            else if (isReady) cardClass += ' ready';
+            else if (isAlmost) cardClass += ' almost';
+
+            let daysLeftText;
+            let daysLeftClass = 'cure-days-left';
+            if (cure.completed) {
+                daysLeftText = '✓ Completado';
+                daysLeftClass += ' ready';
+            } else if (isReady) {
+                daysLeftText = '🎉 ¡LISTO!';
+                daysLeftClass += ' ready';
+            } else if (remainingDays >= 1) {
+                const days = Math.ceil(remainingDays);
+                daysLeftText = `${days} ${days === 1 ? 'día' : 'días'}`;
+            } else {
+                const hours = Math.ceil(remainingDays * 24);
+                daysLeftText = `${hours}h restantes`;
+            }
+
+            const formattedStart = startDate.toLocaleDateString('es-CL', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            const expectedEndDate = new Date(startDate.getTime() + cure.durationDays * 24 * 60 * 60 * 1000);
+            const formattedEnd = expectedEndDate.toLocaleDateString('es-CL', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+
+            return `
+                <div class="${cardClass}">
+                    <div class="cure-card-header">
+                        <div>
+                            <div class="cure-card-title">${cure.typeName}</div>
+                            <div class="cure-card-date">${cure.weightKg}kg · ${cure.thicknessCm}cm grosor</div>
+                            <div class="cure-card-date">Iniciado: ${formattedStart}</div>
+                            <div class="cure-card-date">Listo: ${formattedEnd}</div>
+                        </div>
+                        <span class="${daysLeftClass}">${daysLeftText}</span>
+                    </div>
+
+                    <div class="cure-progress">
+                        <div class="cure-progress-bar">
+                            <div class="cure-progress-fill ${isReady ? 'ready' : ''}" style="width:${progressPct}%"></div>
+                        </div>
+                        <div class="cure-countdown">
+                            <small style="color:#999;">${Math.floor(elapsedDays)} días transcurridos de ${Math.round(cure.durationDays)}</small>
+                            <small style="color:#999;">${Math.round(progressPct)}%</small>
+                        </div>
+                    </div>
+
+                    ${!cure.completed ? `
+                    <div class="cure-card-actions">
+                        ${isReady ? `<button class="cure-action-btn complete" onclick="markCureComplete(${cure.id})">✓ Marcar Completado</button>` : ''}
+                        <button class="cure-action-btn delete" onclick="deleteActiveCure(${cure.id})">🗑️ Eliminar</button>
+                    </div>` : ''}
+                </div>
+            `;
+        }
+
+        function markCureComplete(id) {
+            stateManager.markCureComplete(id);
+            showToast('✓ Curado completado', 'success');
+            renderActiveCures();
+        }
+
+        function deleteActiveCure(id) {
+            if (confirm('¿Eliminar este curado del seguimiento?')) {
+                stateManager.deleteActiveCure(id);
+                renderActiveCures();
+            }
+        }
+
+        // Auto-refresh del tracker cada minuto
+        setInterval(() => {
+            if (document.getElementById('tab-mis-curados').classList.contains('active')) {
+                renderActiveCures();
+            }
+        }, 60000);
+
+        // ================================================================
+        // GADGETS - Mini herramientas
+        // ================================================================
+        function convertTemp(from) {
+            if (from === 'c') {
+                const c = parseFloat(document.getElementById('tempC').value);
+                document.getElementById('tempF').value = Math.round((c * 9 / 5) + 32);
+            } else {
+                const f = parseFloat(document.getElementById('tempF').value);
+                document.getElementById('tempC').value = Math.round(((f - 32) * 5 / 9) * 10) / 10;
+            }
+        }
+
+        function convertWeight(from) {
+            if (from === 'kg') {
+                const kg = parseFloat(document.getElementById('weightKg').value);
+                document.getElementById('weightLbs').value = Math.round(kg * 2.20462 * 100) / 100;
+            } else {
+                const lbs = parseFloat(document.getElementById('weightLbs').value);
+                document.getElementById('weightKg').value = Math.round(lbs * 0.453592 * 100) / 100;
+            }
+        }
+
+        function calculateRub() {
+            const weight = parseFloat(document.getElementById('rubWeight').value) || 1;
+            // Rub estándar: 1-2% del peso total
+            const totalRub = weight * 1000 * 0.015; // 1.5%
+            const result = document.getElementById('rubResult');
+            result.innerHTML = `
+                <p><strong>Total rub:</strong> ${Math.round(totalRub)} g (~${Math.round(totalRub / 5)} cdas)</p>
+                <p style="margin-top:8px; font-size:0.9em;"><strong>Ejemplo de receta:</strong></p>
+                <p style="font-size:0.9em;">• Sal kosher: ${Math.round(totalRub * 0.3)} g</p>
+                <p style="font-size:0.9em;">• Pimienta negra: ${Math.round(totalRub * 0.3)} g</p>
+                <p style="font-size:0.9em;">• Azúcar morena: ${Math.round(totalRub * 0.2)} g</p>
+                <p style="font-size:0.9em;">• Paprika: ${Math.round(totalRub * 0.1)} g</p>
+                <p style="font-size:0.9em;">• Ajo en polvo: ${Math.round(totalRub * 0.05)} g</p>
+                <p style="font-size:0.9em;">• Cebolla en polvo: ${Math.round(totalRub * 0.05)} g</p>
+            `;
+        }
+
+        function quickCureCalc() {
+            const weight = parseFloat(document.getElementById('quickCureWeight').value) || 1;
+            const result = document.getElementById('quickCureResult');
+            const weightG = weight * 1000;
+            result.innerHTML = `
+                <p><strong>Para ${weight} kg de carne:</strong></p>
+                <p style="margin-top:5px;">🧂 Sal: <strong>${Math.round(weightG * 0.025 * 10) / 10} g</strong> (2.5%)</p>
+                <p>🩷 Pink Salt #1: <strong>${Math.round(weightG * 0.0025 * 100) / 100} g</strong> (0.25%)</p>
+                <p>🍬 Azúcar: <strong>${Math.round(weightG * 0.01 * 10) / 10} g</strong> (1%)</p>
+                <p style="margin-top:8px; font-size:0.85em; color:#888;">📐 Tiempo: 1 día por cada 6mm + 2 días buffer</p>
+            `;
+        }
+
+        // Inicializar gadgets al cargar
+        setTimeout(() => {
+            calculateRub();
+            quickCureCalc();
+            // Actualizar badge de curados activos al cargar
+            const cures = stateManager.getActiveCures().filter(c => !c.completed);
+            const badge = document.getElementById('activeCuresBadge');
+            if (cures.length > 0) {
+                badge.textContent = cures.length;
+                badge.style.display = 'inline-block';
+            }
+        }, 100);
 
         // ================================================================
         // 7. INSTANCIAS GLOBALES
