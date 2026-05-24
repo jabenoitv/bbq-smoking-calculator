@@ -709,6 +709,9 @@
                     </optgroup>
                     <optgroup label="Curados">
                         <option value="panceta">Panceta / Bacon (Pork Belly)</option>
+                        <option value="pastrami">Pastrami (de Tapapecho)</option>
+                        <option value="corned_beef">Corned Beef (de Tapapecho)</option>
+                        <option value="beef_jerky">Beef Jerky (Carne Seca)</option>
                     </optgroup>
                 </select>
             </div>
@@ -878,8 +881,35 @@
                         minTempC: 65,
                         optimalTempC: 68,
                         holdingMin: 0,
-                        description: 'Pork belly para hacer bacon casero. Curado previo necesario (ver calculadora de cura).',
-                        needsCure: true
+                        description: 'Pork belly para hacer bacon casero. Curado previo necesario.',
+                        needsCure: 'bacon'
+                    },
+                    pastrami: {
+                        name: 'Pastrami (de Tapapecho)',
+                        timePerKg: 2.0,
+                        minTempC: 88,
+                        optimalTempC: 93,
+                        holdingMin: 30,
+                        description: 'Tapapecho curado + rub de coriandro y pimienta + ahumado.',
+                        needsCure: 'pastrami'
+                    },
+                    corned_beef: {
+                        name: 'Corned Beef (de Tapapecho)',
+                        timePerKg: 1.5,
+                        minTempC: 88,
+                        optimalTempC: 93,
+                        holdingMin: 0,
+                        description: 'Tapapecho en salmuera + hervido (no ahumado). El corned beef tradicional.',
+                        needsCure: 'corned_beef'
+                    },
+                    beef_jerky: {
+                        name: 'Beef Jerky (Carne Seca)',
+                        timePerKg: 0.0,
+                        minTempC: 71,
+                        optimalTempC: 71,
+                        holdingMin: 0,
+                        description: 'Tiras finas de carne magra, marinadas y deshidratadas.',
+                        needsCure: 'beef_jerky'
                     }
                 };
             }
@@ -1100,7 +1130,7 @@
                     errors.weight = 'Peso debe ser entre 0.1 y 100';
                 }
 
-                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero', 'panceta'];
+                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero', 'panceta', 'pastrami', 'corned_beef', 'beef_jerky'];
                 if (!inputs.meatType || !validTypes.includes(inputs.meatType)) {
                     errors.meatType = 'Tipo de carne inválido';
                 }
@@ -1330,80 +1360,172 @@
         }
 
         // ================================================================
-        // 5b. BACON CURE CALCULATOR
-        // Estándar USDA Equilibrium Cure - 156 ppm nitrito max seguro
-        // Fuentes: eatcuredmeat.com, USDA, Ruhlman method
+        // 5b. CURE CALCULATOR - Multi-tipo
+        // Soporta: bacon, pastrami, corned beef, beef jerky
+        // Estándar USDA - 156 ppm nitrito (Cure #1 al 0.25%)
+        // Fuentes: USDA, eatcuredmeat.com, Ruhlman, smoking-meat.com
         // ================================================================
-        class BaconCureCalculator {
-            constructor() {
-                // Porcentajes estándar del peso de la carne
-                this.SALT_PERCENT = 2.5;        // 2-2.75% rango seguro
-                this.PINK_SALT_PERCENT = 0.25;  // = 156 ppm nitrito (USDA max)
-                this.SUGAR_PERCENT = 1.0;       // 1-1.5% para sabor
-                this.SAFETY_BUFFER_DAYS = 2;    // Buffer para equilibrium
+        class CureCalculator {
+            /**
+             * Perfiles de curado para distintos productos
+             * Todos usan Pink Salt #1 al 0.25% (= 156 ppm nitrito, USDA max)
+             */
+            getCureProfiles() {
+                return {
+                    bacon: {
+                        name: 'Bacon (Pork Belly)',
+                        method: 'dry_cure',
+                        saltPct: 2.5,
+                        pinkSaltPct: 0.25,
+                        sugarPct: 1.0,
+                        sugarDefault: true,
+                        cureDaysPerCm: 1.66,
+                        cureBufferDays: 2,
+                        cureMinDays: 5,
+                        defaultThickness: 3.0,
+                        postCure: '🔥 Ahumar a 65-90°C hasta interna 65°C (~2-4h)',
+                        woodSuggestion: 'Manzano, cerezo, nogal'
+                    },
+                    pastrami: {
+                        name: 'Pastrami',
+                        method: 'dry_cure_then_rub',
+                        saltPct: 2.5,
+                        pinkSaltPct: 0.25,
+                        sugarPct: 1.5,
+                        sugarDefault: true,
+                        cureDaysPerCm: 1.66,
+                        cureBufferDays: 3,
+                        cureMinDays: 7,
+                        defaultThickness: 5.0,
+                        rub: {
+                            coriander: '2 cdas por kg',
+                            pepper: '2 cdas por kg',
+                            garlic: '1 cdta por kg',
+                            mustard: '1 cdta por kg'
+                        },
+                        postCure: '🔥 Ahumar a 107°C hasta interna 93°C (~8-10h)',
+                        woodSuggestion: 'Nogal, roble, hickory'
+                    },
+                    corned_beef: {
+                        name: 'Corned Beef',
+                        method: 'wet_brine',
+                        saltPct: 3.5,
+                        pinkSaltPct: 0.25,
+                        sugarPct: 2.0,
+                        sugarDefault: true,
+                        waterPerKg: 1.0,  // 1L por kg de carne
+                        cureDaysPerCm: 1.5,
+                        cureBufferDays: 3,
+                        cureMinDays: 5,
+                        defaultThickness: 5.0,
+                        spices: 'Pickling spices: clavo, pimienta gorda, hojas laurel, mostaza, cilantro, cardamomo',
+                        postCure: '🍲 Hervir en agua con especias por 3-4h hasta tierno'
+                    },
+                    beef_jerky: {
+                        name: 'Beef Jerky',
+                        method: 'marinade',
+                        saltPct: 1.5,
+                        pinkSaltPct: 0.25,
+                        sugarPct: 1.0,
+                        sugarDefault: true,
+                        cureHoursMin: 12,
+                        cureHoursMax: 24,
+                        defaultThickness: 0.5,
+                        marinade: 'Salsa soya, salsa Worcestershire, ajo, cebolla, pimienta',
+                        postCure: '🌡️ Deshidratar a 71°C por 4-8h hasta seco pero flexible',
+                        meatRecommendation: 'Cortes magros: posta negra, ganso, lomo liso'
+                    }
+                };
             }
 
             /**
-             * Calcula receta de cura para bacon
-             * @param {number} weightKg - Peso del pork belly en kg
-             * @param {number} thicknessCm - Grosor del corte en cm
-             * @param {Object} options - { salt%, sugar%, includeSugar }
+             * Calcula receta de cura para cualquier tipo
+             * @param {string} type - 'bacon', 'pastrami', 'corned_beef', 'beef_jerky'
+             * @param {number} weightKg - Peso de la carne
+             * @param {number} thicknessCm - Grosor (para tiempo)
+             * @param {Object} options - { includeSugar }
              */
-            calculate(weightKg, thicknessCm, options = {}) {
+            calculate(type, weightKg, thicknessCm, options = {}) {
+                const profile = this.getCureProfiles()[type];
+                if (!profile) throw new Error(`Tipo de cura desconocido: ${type}`);
+
                 const weightG = weightKg * 1000;
-                const saltPct = options.saltPercent || this.SALT_PERCENT;
-                const sugarPct = options.sugarPercent || this.SUGAR_PERCENT;
                 const includeSugar = options.includeSugar !== false;
 
-                // Cálculos en gramos
-                const saltGrams = (weightG * saltPct) / 100;
-                const pinkSaltGrams = (weightG * this.PINK_SALT_PERCENT) / 100;
-                const sugarGrams = includeSugar ? (weightG * sugarPct) / 100 : 0;
+                const saltGrams = (weightG * profile.saltPct) / 100;
+                const pinkSaltGrams = (weightG * profile.pinkSaltPct) / 100;
+                const sugarGrams = includeSugar ? (weightG * profile.sugarPct) / 100 : 0;
 
-                // Tiempo de curado: 1 día por cada 6mm (0.6cm) de grosor + buffer
-                const cureDays = Math.ceil(thicknessCm / 0.6) + this.SAFETY_BUFFER_DAYS;
-                const cureDaysMin = Math.max(5, Math.ceil(thicknessCm / 0.6));
-                const cureDaysMax = cureDays + 2;
+                // Tiempo según método
+                let cureTime;
+                if (profile.method === 'marinade') {
+                    cureTime = {
+                        unit: 'horas',
+                        min: profile.cureHoursMin,
+                        recommended: 18,
+                        max: profile.cureHoursMax
+                    };
+                } else {
+                    const days = Math.ceil(thicknessCm / 0.6) + profile.cureBufferDays;
+                    cureTime = {
+                        unit: 'días',
+                        min: Math.max(profile.cureMinDays, Math.ceil(thicknessCm / 0.6)),
+                        recommended: Math.max(profile.cureMinDays, days),
+                        max: Math.max(profile.cureMinDays, days) + 2
+                    };
+                }
 
-                // PPM de nitrito (siempre 156 con 0.25% Pink Salt #1)
-                const nitritePPM = 156;
+                // Agua para wet brine
+                const waterLiters = profile.waterPerKg ? (weightKg * profile.waterPerKg) : 0;
 
                 return {
+                    type,
+                    profile,
                     weightKg,
                     weightG,
                     thicknessCm,
                     saltGrams: Math.round(saltGrams * 10) / 10,
                     pinkSaltGrams: Math.round(pinkSaltGrams * 100) / 100,
                     sugarGrams: Math.round(sugarGrams * 10) / 10,
-                    cureDaysMin,
-                    cureDaysRecommended: cureDays,
-                    cureDaysMax,
-                    nitritePPM,
-                    saltPct,
-                    sugarPct,
+                    waterLiters,
+                    cureTime,
+                    nitritePPM: 156,
                     includeSugar,
                     totalCureGrams: Math.round((saltGrams + pinkSaltGrams + sugarGrams) * 10) / 10
                 };
             }
 
             /**
-             * Genera HTML para mostrar receta de cura
+             * Renderiza receta de cura como HTML
              */
             renderRecipe(cure) {
+                const p = cure.profile;
+                const methodLabel = {
+                    'dry_cure': 'Equilibrium Dry Cure',
+                    'dry_cure_then_rub': 'Dry Cure + Rub',
+                    'wet_brine': 'Wet Brine (Salmuera)',
+                    'marinade': 'Marinada Corta'
+                }[p.method];
+
                 return `
                     <div class="bacon-cure-section">
-                        <h3>🥓 Calculadora de Cura para Bacon</h3>
-                        <p class="cure-subtitle">Método Equilibrium Cure (USDA - 156 ppm nitrito)</p>
+                        <h3>🥓 Calculadora de Cura: ${p.name}</h3>
+                        <p class="cure-subtitle">Método: ${methodLabel} · USDA estándar (156 ppm nitrito)</p>
 
                         <div class="cure-inputs">
+                            ${cure.cureTime.unit === 'días' ? `
                             <div class="form-group">
-                                <label for="thicknessInput">Grosor de la panceta (cm)</label>
-                                <input id="thicknessInput" type="number" value="${cure.thicknessCm}" min="1" max="10" step="0.5" onchange="recalculateCure()">
-                            </div>
+                                <label for="thicknessInput">Grosor de la carne (cm)</label>
+                                <input id="thicknessInput" type="number" value="${cure.thicknessCm}" min="0.5" max="15" step="0.5" onchange="recalculateCure()">
+                            </div>` : `
+                            <div class="form-group">
+                                <label for="thicknessInput">Grosor de las tiras (cm)</label>
+                                <input id="thicknessInput" type="number" value="${cure.thicknessCm}" min="0.3" max="2" step="0.1" onchange="recalculateCure()">
+                            </div>`}
                             <div class="form-group">
                                 <label>
                                     <input type="checkbox" id="includeSugar" ${cure.includeSugar ? 'checked' : ''} onchange="recalculateCure()">
-                                    Incluir azúcar (sabor)
+                                    Incluir azúcar (recomendado)
                                 </label>
                             </div>
                         </div>
@@ -1413,9 +1535,9 @@
                                 <h4>🧂 Ingredientes (para ${cure.weightKg} kg)</h4>
                                 <table class="cure-table">
                                     <tr>
-                                        <td>Sal de mar</td>
+                                        <td>Sal ${p.method === 'wet_brine' ? 'kosher/marina' : 'de mar'}</td>
                                         <td><strong>${cure.saltGrams} g</strong></td>
-                                        <td class="cure-pct">${cure.saltPct}%</td>
+                                        <td class="cure-pct">${p.saltPct}%</td>
                                     </tr>
                                     <tr>
                                         <td>Pink Salt #1 (Prague Powder)</td>
@@ -1424,63 +1546,156 @@
                                     </tr>
                                     ${cure.includeSugar ? `
                                     <tr>
-                                        <td>Azúcar morena</td>
+                                        <td>Azúcar ${p.method === 'corned_beef' ? 'morena' : 'morena/blanca'}</td>
                                         <td><strong>${cure.sugarGrams} g</strong></td>
-                                        <td class="cure-pct">${cure.sugarPct}%</td>
+                                        <td class="cure-pct">${p.sugarPct}%</td>
+                                    </tr>` : ''}
+                                    ${cure.waterLiters ? `
+                                    <tr>
+                                        <td>Agua (para salmuera)</td>
+                                        <td><strong>${cure.waterLiters} L</strong></td>
+                                        <td class="cure-pct">1L/kg</td>
                                     </tr>` : ''}
                                     <tr class="cure-total">
-                                        <td>Total cura</td>
+                                        <td>Total cura sólida</td>
                                         <td><strong>${cure.totalCureGrams} g</strong></td>
                                         <td>—</td>
                                     </tr>
                                 </table>
+                                ${p.rub ? `
+                                <div class="rub-info">
+                                    <strong>+ Rub post-cura:</strong>
+                                    <ul>
+                                        <li>Coriandro molido: ${p.rub.coriander}</li>
+                                        <li>Pimienta negra molida: ${p.rub.pepper}</li>
+                                        <li>Ajo en polvo: ${p.rub.garlic}</li>
+                                        <li>Mostaza en polvo: ${p.rub.mustard}</li>
+                                    </ul>
+                                </div>` : ''}
+                                ${p.spices ? `
+                                <div class="rub-info">
+                                    <strong>+ Especias en salmuera:</strong>
+                                    <p>${p.spices}</p>
+                                </div>` : ''}
+                                ${p.marinade ? `
+                                <div class="rub-info">
+                                    <strong>+ Líquidos de marinada (al gusto):</strong>
+                                    <p>${p.marinade}</p>
+                                </div>` : ''}
                             </div>
 
                             <div class="cure-card">
                                 <h4>⏱️ Tiempo de Curado</h4>
                                 <div class="cure-time">
                                     <div class="cure-time-main">
-                                        <span class="big-number">${cure.cureDaysRecommended}</span>
-                                        <span class="cure-time-label">días recomendados</span>
+                                        <span class="big-number">${cure.cureTime.recommended}</span>
+                                        <span class="cure-time-label">${cure.cureTime.unit} recomendados</span>
                                     </div>
-                                    <p class="cure-time-range">Rango seguro: ${cure.cureDaysMin}–${cure.cureDaysMax} días</p>
-                                    <p class="cure-time-formula">📐 Fórmula: 1 día por cada 6mm grosor + 2 días buffer</p>
+                                    <p class="cure-time-range">Rango: ${cure.cureTime.min}–${cure.cureTime.max} ${cure.cureTime.unit}</p>
+                                    <p class="cure-time-formula">${cure.cureTime.unit === 'días' ? '📐 1 día por cada 6mm grosor + buffer' : '📐 12-24h para marinada uniforme'}</p>
                                 </div>
                             </div>
 
                             <div class="cure-card cure-safety">
                                 <h4>⚠️ Seguridad</h4>
-                                <p><strong>${cure.nitritePPM} ppm nitrito</strong> (USDA max: 200 ppm)</p>
-                                <p class="safety-note">Nivel seguro garantizado con 0.25% Pink Salt #1</p>
+                                <p><strong>${cure.nitritePPM} ppm nitrito</strong></p>
+                                <p class="safety-note">USDA max: 200 ppm · Tu receta: seguro garantizado</p>
                             </div>
                         </div>
 
+                        ${p.meatRecommendation ? `
+                        <div class="cure-process">
+                            <h4>🥩 Carne recomendada</h4>
+                            <p>${p.meatRecommendation}</p>
+                        </div>` : ''}
+
                         <div class="cure-process">
                             <h4>📋 Proceso Paso a Paso</h4>
-                            <ol class="process-list">
-                                <li><strong>Mezcla la cura:</strong> Combina sal, Pink Salt #1 ${cure.includeSugar ? 'y azúcar' : ''} en un bowl.</li>
-                                <li><strong>Aplica la cura:</strong> Frota toda la mezcla sobre la panceta, cubriendo TODA la superficie.</li>
-                                <li><strong>Bolsa hermética:</strong> Pon la panceta en bolsa Ziploc o al vacío. Saca todo el aire posible.</li>
-                                <li><strong>Refrigera:</strong> ${cure.cureDaysRecommended} días a 2-4°C. Voltea la bolsa diariamente.</li>
-                                <li><strong>Enjuaga:</strong> Lava bien bajo agua fría para quitar exceso de sal. Seca con papel.</li>
-                                <li><strong>Forma pellicle:</strong> Reposa en heladera sin tapar 12-24h para formar superficie pegajosa.</li>
-                                <li><strong>Ahúma:</strong> A 65-90°C hasta interna 65°C (~2-4h). Usa madera de manzano, cerezo o nogal.</li>
-                                <li><strong>Enfría:</strong> Refrigera mínimo 12h antes de cortar. Mejora con el reposo.</li>
-                            </ol>
+                            ${this.renderProcess(cure)}
                         </div>
+
+                        ${p.woodSuggestion ? `
+                        <div class="cure-process">
+                            <h4>🪵 Madera Recomendada</h4>
+                            <p>${p.woodSuggestion}</p>
+                        </div>` : ''}
 
                         <div class="cure-warnings">
                             <h4>⚠️ Advertencias Importantes</h4>
                             <ul>
-                                <li><strong>Pink Salt #1 es OBLIGATORIO</strong> para prevenir botulismo. NO uses sal regular sola.</li>
-                                <li>Pink Salt #1 es ROSADO (Prague Powder #1), NO confundir con sal del Himalaya.</li>
+                                <li><strong>Pink Salt #1 es OBLIGATORIO</strong> para prevenir botulismo.</li>
+                                <li>Pink Salt #1 es ROSADO (Prague Powder #1), NO sal del Himalaya.</li>
                                 <li>NUNCA excedas 0.25% del peso de carne (200 ppm es límite USDA).</li>
                                 <li>Mantén siempre refrigerado durante curado (2-4°C).</li>
-                                <li>Si la panceta huele mal o tiene textura viscosa, descártala.</li>
+                                <li>Si la carne huele mal o tiene textura viscosa, descártala.</li>
                             </ul>
                         </div>
                     </div>
                 `;
+            }
+
+            /**
+             * Render proceso según el método
+             */
+            renderProcess(cure) {
+                const method = cure.profile.method;
+                const time = cure.cureTime.recommended;
+                const unit = cure.cureTime.unit;
+
+                if (method === 'dry_cure') {
+                    return `
+                        <ol class="process-list">
+                            <li><strong>Mezcla la cura:</strong> Combina sal, Pink Salt #1 ${cure.includeSugar ? 'y azúcar' : ''} en un bowl.</li>
+                            <li><strong>Aplica:</strong> Frota toda la mezcla sobre la carne, cubriendo TODA la superficie.</li>
+                            <li><strong>Bolsa hermética:</strong> Pon en bolsa Ziploc o al vacío. Saca el aire.</li>
+                            <li><strong>Refrigera:</strong> ${time} ${unit} a 2-4°C. Voltea diariamente.</li>
+                            <li><strong>Enjuaga:</strong> Lava bajo agua fría. Seca con papel.</li>
+                            <li><strong>Pellicle:</strong> Reposa en heladera sin tapar 12-24h.</li>
+                            <li><strong>${cure.profile.postCure}</strong></li>
+                            <li><strong>Enfría:</strong> Refrigera 12h antes de cortar.</li>
+                        </ol>
+                    `;
+                } else if (method === 'dry_cure_then_rub') {
+                    return `
+                        <ol class="process-list">
+                            <li><strong>Mezcla la cura base:</strong> Sal + Pink Salt #1 ${cure.includeSugar ? '+ azúcar' : ''}.</li>
+                            <li><strong>Aplica:</strong> Frota sobre el tapapecho cubriendo todo.</li>
+                            <li><strong>Bolsa hermética:</strong> Pon en bolsa al vacío.</li>
+                            <li><strong>Curado:</strong> ${time} ${unit} en refrigerador, volteando diariamente.</li>
+                            <li><strong>Enjuaga:</strong> Lava y remoja en agua fría 1-2h (cambia agua cada 30min).</li>
+                            <li><strong>Seca:</strong> Papel absorbente, deja reposar en heladera.</li>
+                            <li><strong>Aplica rub:</strong> Cubre TODO con coriandro + pimienta + ajo + mostaza.</li>
+                            <li><strong>${cure.profile.postCure}</strong></li>
+                            <li><strong>Reposo:</strong> Envuelve en papel y reposa 1h antes de cortar contra la fibra.</li>
+                        </ol>
+                    `;
+                } else if (method === 'wet_brine') {
+                    return `
+                        <ol class="process-list">
+                            <li><strong>Calienta salmuera:</strong> En olla grande, ${cure.waterLiters}L agua + sal + Pink Salt #1 ${cure.includeSugar ? '+ azúcar' : ''} + especias.</li>
+                            <li><strong>Hierve:</strong> Lleva a ebullición revolviendo hasta disolver todo.</li>
+                            <li><strong>Enfría:</strong> Deja enfriar completamente (importante: nunca poner carne en salmuera caliente).</li>
+                            <li><strong>Sumerge la carne:</strong> Pon el tapapecho en la salmuera. Debe estar completamente cubierto (usa peso si flota).</li>
+                            <li><strong>Refrigera:</strong> ${time} ${unit} a 2-4°C. Voltea cada 1-2 días.</li>
+                            <li><strong>Saca y enjuaga:</strong> Quita la carne, lava bajo agua fría, remoja 1h.</li>
+                            <li><strong>${cure.profile.postCure}</strong></li>
+                            <li><strong>Reposo:</strong> Deja reposar 15 min antes de rebanar contra la fibra.</li>
+                        </ol>
+                    `;
+                } else if (method === 'marinade') {
+                    return `
+                        <ol class="process-list">
+                            <li><strong>Corta la carne:</strong> Tiras de ${cure.thicknessCm}cm (más fino = más rápido seca).</li>
+                            <li><strong>Mezcla marinada:</strong> Salsa soya, Worcestershire, ajo, cebolla en polvo, pimienta + sal + Pink Salt #1 ${cure.includeSugar ? '+ azúcar' : ''}.</li>
+                            <li><strong>Marina:</strong> Pon las tiras en la marinada, refrigera ${time} ${unit}.</li>
+                            <li><strong>Saca y seca:</strong> Quita exceso de marinada con papel.</li>
+                            <li><strong>${cure.profile.postCure}</strong></li>
+                            <li><strong>Verifica seco:</strong> Debe doblarse sin romperse. Si se rompe, está sobre-secado.</li>
+                            <li><strong>Conserva:</strong> En frasco hermético hasta 2 meses (refrigerado: 6 meses).</li>
+                        </ol>
+                    `;
+                }
+                return '';
             }
         }
 
@@ -1579,7 +1794,7 @@
                     <button class="action-btn" onclick="location.href='#'">🔄 Nueva Consulta</button>
                 </div>
 
-                ${result.formula.needsCure ? renderCureSection(result.weightKg) : ''}
+                ${result.formula.needsCure ? renderCureSection(result.weightKg, result.formula.needsCure) : ''}
             `;
 
             resultsDiv.innerHTML = resultsHTML;
@@ -1587,10 +1802,11 @@
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function renderCureSection(weightKg) {
-            const defaultThickness = 3.0;
-            const cure = baconCure.calculate(weightKg, defaultThickness, { includeSugar: true });
-            return baconCure.renderRecipe(cure);
+        function renderCureSection(weightKg, cureType) {
+            const profile = cureCalc.getCureProfiles()[cureType];
+            const defaultThickness = profile ? profile.defaultThickness : 3.0;
+            const cure = cureCalc.calculate(cureType, weightKg, defaultThickness, { includeSugar: true });
+            return cureCalc.renderRecipe(cure);
         }
 
         function recalculateCure() {
@@ -1598,13 +1814,15 @@
             const sugarCheckbox = document.getElementById('includeSugar');
             if (!thicknessInput || !lastResult) return;
 
-            const thickness = parseFloat(thicknessInput.value) || 3.0;
+            const cureType = lastResult.formula.needsCure;
+            const profile = cureCalc.getCureProfiles()[cureType];
+            const thickness = parseFloat(thicknessInput.value) || profile.defaultThickness;
             const includeSugar = sugarCheckbox ? sugarCheckbox.checked : true;
 
-            const cure = baconCure.calculate(lastResult.weightKg, thickness, { includeSugar });
+            const cure = cureCalc.calculate(cureType, lastResult.weightKg, thickness, { includeSugar });
             const cureContainer = document.querySelector('.bacon-cure-section');
             if (cureContainer) {
-                cureContainer.outerHTML = baconCure.renderRecipe(cure);
+                cureContainer.outerHTML = cureCalc.renderRecipe(cure);
             }
         }
 
@@ -1614,7 +1832,7 @@
         const calculator = new BBQEngine();
         const validator = new BBQValidator();
         const stateManager = new StateManager();
-        const baconCure = new BaconCureCalculator();
+        const cureCalc = new CureCalculator();
 
         let lastResult = null;
 
