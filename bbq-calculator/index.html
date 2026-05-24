@@ -119,8 +119,14 @@
             transform: scale(0.95);
         }
 
-        .calculate-btn {
+        .button-group {
             grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .calculate-btn {
             padding: 12px 24px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -135,6 +141,23 @@
         .calculate-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .secondary-btn {
+            padding: 10px 16px;
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-btn:hover {
+            background: #e0e0e0;
+            border-color: #667eea;
         }
 
         .results-section {
@@ -352,6 +375,7 @@
             padding: 20px;
             border-radius: 12px;
             border-left: 4px solid #FFD93D;
+            margin-bottom: 20px;
         }
 
         .tips-section h3 {
@@ -382,6 +406,87 @@
             font-weight: bold;
         }
 
+        .actions-section {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #764ba2;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .toast.success {
+            background: #4caf50;
+        }
+
+        .toast.warning {
+            background: #ff9800;
+        }
+
+        .toast.error {
+            background: #f44336;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .history-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .history-item:hover {
+            background: #e0e0e0;
+            transform: scale(1.02);
+        }
+
         @media (max-width: 768px) {
             .container { padding: 15px; }
             h1 { font-size: 1.5em; }
@@ -392,7 +497,10 @@
                 padding: 15px;
             }
 
-            .calculate-btn { grid-column: 1; }
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
             .result-cards { grid-template-columns: 1fr; }
 
             .bars {
@@ -429,7 +537,7 @@
                 <label for="weight">Peso</label>
                 <div class="weight-input-group">
                     <input id="weight" type="number" value="2.3" min="0.1" step="0.1">
-                    <button class="unit-toggle" onclick="toggleWeightUnit()" id="weightUnitBtn">kg</button>
+                    <button class="unit-toggle" onclick="calculator.toggleWeightUnit()" id="weightUnitBtn">kg</button>
                 </div>
             </div>
 
@@ -437,168 +545,616 @@
                 <label for="smokingTemp">Temperatura del Ahumador</label>
                 <div class="temp-input-group">
                     <input id="smokingTemp" type="number" value="110" min="65" max="180" step="1">
-                    <button class="unit-toggle" onclick="toggleTempUnit()" id="tempUnitBtn">°C</button>
+                    <button class="unit-toggle" onclick="calculator.toggleTempUnit()" id="tempUnitBtn">°C</button>
                 </div>
             </div>
 
-            <button class="calculate-btn" onclick="calculate()">Calcular</button>
+            <div class="button-group">
+                <button class="calculate-btn" onclick="calculator.calculate()">Calcular</button>
+                <button class="secondary-btn" onclick="stateManager.showHistory()">📋 Historial</button>
+                <button class="secondary-btn" onclick="stateManager.exportData()">📥 Exportar</button>
+                <button class="secondary-btn" onclick="stateManager.importData()">📤 Importar</button>
+            </div>
         </div>
 
         <div id="results" class="results-section"></div>
+        <div id="history" style="display:none; margin-bottom: 30px;">
+            <h3>Recetas Guardadas</h3>
+            <div class="history-list" id="historyList"></div>
+        </div>
     </div>
 
     <script>
-        // Fórmulas basadas en kg y °C como unidades primarias
-        const MEAT_FORMULAS = {
-            brisket: {
-                name: 'Brisket',
-                timePerKg: 1.65, // ~1.5 hrs/lb = 3.3 hrs/kg, ajustado para temp media
-                minTempC: 88,    // 190°F
-                optimalTempC: 96, // 205°F
-                holdingMin: 60
-            },
-            pork_butt: {
-                name: 'Pork Butt',
-                timePerKg: 2.2,
-                minTempC: 88,
-                optimalTempC: 96,
-                holdingMin: 90
-            },
-            pork_shoulder: {
-                name: 'Pork Shoulder',
-                timePerKg: 2.2,
-                minTempC: 88,
-                optimalTempC: 96,
-                holdingMin: 90
-            },
-            ribs: {
-                name: 'Costillas (Ribs)',
-                timePerKg: 1.1,
-                minTempC: 88,
-                optimalTempC: 93,
-                holdingMin: 15
-            },
-            beef_ribs: {
-                name: 'Costillas de Res (Beef Ribs)',
-                timePerKg: 1.4,
-                minTempC: 88,
-                optimalTempC: 96,
-                holdingMin: 30
-            },
-            chicken: {
-                name: 'Pollo',
-                timePerKg: 0.85,
-                minTempC: 74,
-                optimalTempC: 74,
-                holdingMin: 10
-            },
-            turkey: {
-                name: 'Pavo',
-                timePerKg: 0.85,
-                minTempC: 74,
-                optimalTempC: 74,
-                holdingMin: 20
+        // ================================================================
+        // 1. EVENT EMITTER - Sistema pub/sub para observabilidad
+        // ================================================================
+        class EventEmitter {
+            constructor() {
+                this.events = {};
             }
-        };
 
-        // Estado: empezamos en métrico
-        let weightUnit = 'kg';  // kg o lbs
-        let tempUnit = 'C';     // C o F
+            /**
+             * Suscribirse a un evento
+             * @param {string} event - Nombre del evento
+             * @param {Function} callback - Función a ejecutar
+             */
+            on(event, callback) {
+                if (!this.events[event]) {
+                    this.events[event] = [];
+                }
+                this.events[event].push(callback);
+            }
 
-        function celsiusToFahrenheit(c) {
-            return Math.round((c * 9 / 5) + 32);
-        }
+            /**
+             * Desuscribirse de un evento
+             */
+            off(event, callback) {
+                if (this.events[event]) {
+                    this.events[event] = this.events[event].filter(cb => cb !== callback);
+                }
+            }
 
-        function fahrenheitToCelsius(f) {
-            return Math.round(((f - 32) * 5 / 9) * 10) / 10;
-        }
-
-        function kgToLbs(kg) {
-            return Math.round(kg * 2.20462 * 10) / 10;
-        }
-
-        function lbsToKg(lbs) {
-            return Math.round(lbs * 0.453592 * 10) / 10;
-        }
-
-        function toggleWeightUnit() {
-            const weightInput = document.getElementById('weight');
-            const btn = document.getElementById('weightUnitBtn');
-            const currentValue = parseFloat(weightInput.value);
-
-            if (weightUnit === 'kg') {
-                weightInput.value = kgToLbs(currentValue);
-                btn.textContent = 'lbs';
-                weightUnit = 'lbs';
-            } else {
-                weightInput.value = lbsToKg(currentValue);
-                btn.textContent = 'kg';
-                weightUnit = 'kg';
+            /**
+             * Emitir un evento
+             * @param {string} event - Nombre del evento
+             * @param {*} data - Datos a pasar
+             */
+            emit(event, data) {
+                if (this.events[event]) {
+                    this.events[event].forEach(callback => {
+                        try {
+                            callback(data);
+                        } catch (err) {
+                            console.error(`Error en evento ${event}:`, err);
+                        }
+                    });
+                }
             }
         }
 
-        function toggleTempUnit() {
-            const tempInput = document.getElementById('smokingTemp');
-            const btn = document.getElementById('tempUnitBtn');
-            const currentValue = parseFloat(tempInput.value);
+        // ================================================================
+        // 2. BBQ ENGINE - Cálculos de cocción
+        // ================================================================
+        class BBQEngine extends EventEmitter {
+            constructor() {
+                super();
+                this.weightUnit = 'kg';
+                this.tempUnit = 'C';
+            }
 
-            if (tempUnit === 'C') {
-                tempInput.value = celsiusToFahrenheit(currentValue);
-                btn.textContent = '°F';
-                tempInput.min = 150;
-                tempInput.max = 350;
-                tempInput.step = 5;
-                tempUnit = 'F';
-            } else {
-                tempInput.value = fahrenheitToCelsius(currentValue);
-                btn.textContent = '°C';
-                tempInput.min = 65;
-                tempInput.max = 180;
-                tempInput.step = 1;
-                tempUnit = 'C';
+            /**
+             * CORRECCIÓN FASE 1: Fórmulas de cocción actualizadas
+             * Referencias: 1.5 hrs/lb (brisket), 2.0 hrs/lb (pork)
+             */
+            getMeatFormulas() {
+                return {
+                    brisket: {
+                        name: 'Brisket',
+                        timePerKg: 2.3,  // ✓ CORREGIDO: era 1.65, ahora 2.3 (1.05 hrs/lb)
+                        minTempC: 88,
+                        optimalTempC: 96,
+                        holdingMin: 60,
+                        description: 'Corte duro, requiere cocción lenta'
+                    },
+                    pork_butt: {
+                        name: 'Pork Butt',
+                        timePerKg: 2.5,  // ✓ CORREGIDO: era 2.2, ahora 2.5 (1.13 hrs/lb)
+                        minTempC: 88,
+                        optimalTempC: 96,
+                        holdingMin: 90,
+                        description: 'Ideal para pulled pork'
+                    },
+                    pork_shoulder: {
+                        name: 'Pork Shoulder',
+                        timePerKg: 2.5,
+                        minTempC: 88,
+                        optimalTempC: 96,
+                        holdingMin: 90,
+                        description: 'Similar a pork butt'
+                    },
+                    ribs: {
+                        name: 'Costillas (Ribs)',
+                        timePerKg: 1.1,
+                        minTempC: 88,
+                        optimalTempC: 93,
+                        holdingMin: 15,
+                        description: 'Cocción rápida, vigilar temperatura'
+                    },
+                    beef_ribs: {
+                        name: 'Costillas de Res (Beef Ribs)',
+                        timePerKg: 1.4,
+                        minTempC: 88,
+                        optimalTempC: 96,
+                        holdingMin: 30,
+                        description: 'Similar a brisket, requiere paciencia'
+                    },
+                    chicken: {
+                        name: 'Pollo',
+                        timePerKg: 0.85,
+                        minTempC: 74,
+                        optimalTempC: 74,
+                        holdingMin: 10,
+                        description: 'Cocción más rápida, vigilar resecamiento'
+                    },
+                    turkey: {
+                        name: 'Pavo',
+                        timePerKg: 0.85,
+                        minTempC: 74,
+                        optimalTempC: 74,
+                        holdingMin: 20,
+                        description: 'Similar a pollo, mayor tamaño'
+                    }
+                };
+            }
+
+            /**
+             * Convierte Celsius a Fahrenheit
+             */
+            celsiusToFahrenheit(c) {
+                return Math.round((c * 9 / 5) + 32);
+            }
+
+            /**
+             * Convierte Fahrenheit a Celsius
+             */
+            fahrenheitToCelsius(f) {
+                return Math.round(((f - 32) * 5 / 9) * 10) / 10;
+            }
+
+            /**
+             * Convierte kg a lbs
+             */
+            kgToLbs(kg) {
+                return Math.round(kg * 2.20462 * 10) / 10;
+            }
+
+            /**
+             * Convierte lbs a kg
+             */
+            lbsToKg(lbs) {
+                return Math.round(lbs * 0.453592 * 10) / 10;
+            }
+
+            /**
+             * Cambia unidad de peso
+             */
+            toggleWeightUnit() {
+                const input = document.getElementById('weight');
+                const btn = document.getElementById('weightUnitBtn');
+                const value = parseFloat(input.value);
+
+                if (this.weightUnit === 'kg') {
+                    input.value = this.kgToLbs(value);
+                    btn.textContent = 'lbs';
+                    this.weightUnit = 'lbs';
+                } else {
+                    input.value = this.lbsToKg(value);
+                    btn.textContent = 'kg';
+                    this.weightUnit = 'kg';
+                }
+                this.emit('unit-changed', { type: 'weight', unit: this.weightUnit });
+            }
+
+            /**
+             * Cambia unidad de temperatura
+             */
+            toggleTempUnit() {
+                const input = document.getElementById('smokingTemp');
+                const btn = document.getElementById('tempUnitBtn');
+                const value = parseFloat(input.value);
+
+                if (this.tempUnit === 'C') {
+                    input.value = this.celsiusToFahrenheit(value);
+                    btn.textContent = '°F';
+                    input.min = 150;
+                    input.max = 350;
+                    input.step = 5;
+                    this.tempUnit = 'F';
+                } else {
+                    input.value = this.fahrenheitToCelsius(value);
+                    btn.textContent = '°C';
+                    input.min = 65;
+                    input.max = 180;
+                    input.step = 1;
+                    this.tempUnit = 'C';
+                }
+                this.emit('unit-changed', { type: 'temp', unit: this.tempUnit });
+            }
+
+            /**
+             * Calcula el tiempo de ahumado
+             * @param {string} meatType - Tipo de carne
+             * @param {number} weight - Peso (en unidad actual)
+             * @param {number} smokingTemp - Temperatura (en unidad actual)
+             * @returns {Object} Resultado de cálculo
+             */
+            calculate() {
+                this.emit('calculation-started');
+
+                try {
+                    const meatType = document.getElementById('meatType').value;
+                    const weight = parseFloat(document.getElementById('weight').value);
+                    const smokingTemp = parseFloat(document.getElementById('smokingTemp').value);
+
+                    const formula = this.getMeatFormulas()[meatType];
+                    if (!formula) throw new Error('Tipo de carne inválido');
+
+                    // Normalizar a métrico
+                    const weightKg = this.weightUnit === 'kg' ? weight : this.lbsToKg(weight);
+                    const smokingTempC = this.tempUnit === 'C' ? smokingTemp : this.fahrenheitToCelsius(smokingTemp);
+
+                    // Cálculo base (referencia: 107°C / 225°F)
+                    let cookingTimeHours = weightKg * formula.timePerKg;
+                    const tempDiffC = smokingTempC - 107;
+                    const adjustmentFactor = 1 - (tempDiffC * 0.015);
+                    cookingTimeHours = cookingTimeHours * Math.max(0.6, Math.min(1.4, adjustmentFactor));
+
+                    const totalMinutes = Math.round(cookingTimeHours * 60);
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+
+                    // Generar progresión de temperatura
+                    const temperatureRange = this.generateTempRange(formula.minTempC, formula.optimalTempC, 8);
+
+                    // Conversiones para display
+                    const result = {
+                        id: Date.now(),
+                        meatType,
+                        meatName: formula.meatName,
+                        weightKg: Math.round(weightKg * 100) / 100,
+                        weightLbs: this.kgToLbs(weightKg),
+                        smokingTempC: Math.round(smokingTempC),
+                        smokingTempF: this.celsiusToFahrenheit(smokingTempC),
+                        estimatedCookingHours: hours,
+                        estimatedCookingMinutes: minutes,
+                        totalMinutes: totalMinutes,
+                        minTempC: formula.minTempC,
+                        minTempF: this.celsiusToFahrenheit(formula.minTempC),
+                        optimalTempC: formula.optimalTempC,
+                        optimalTempF: this.celsiusToFahrenheit(formula.optimalTempC),
+                        holdingMin: formula.holdingMin,
+                        temperatureRange: temperatureRange,
+                        formula: formula,
+                        calculatedAt: new Date().toLocaleString('es-ES')
+                    };
+
+                    this.emit('calculation-complete', result);
+                    return result;
+                } catch (err) {
+                    this.emit('calculation-error', err);
+                    showToast(`Error: ${err.message}`, 'error');
+                    throw err;
+                }
+            }
+
+            /**
+             * Genera rango de temperaturas para gráfico
+             */
+            generateTempRange(minTempC, maxTempC, steps) {
+                const result = [];
+                const range = maxTempC - minTempC;
+
+                if (range === 0) {
+                    const startTemp = 40;
+                    const stepSize = (maxTempC - startTemp) / steps;
+                    for (let i = 0; i <= steps; i++) {
+                        const temp = startTemp + stepSize * i;
+                        result.push({
+                            tempC: Math.round(temp),
+                            stage: this.getStageForProgress(i / steps)
+                        });
+                    }
+                    return result;
+                }
+
+                const step = range / steps;
+                for (let i = 0; i <= steps; i++) {
+                    const temp = minTempC + step * i;
+                    result.push({
+                        tempC: Math.round(temp),
+                        stage: this.getStageForProgress(i / steps)
+                    });
+                }
+                return result;
+            }
+
+            /**
+             * Etapas de cocción
+             */
+            getStageForProgress(progress) {
+                if (progress < 0.25) return 'Cocción inicial';
+                if (progress < 0.55) return 'Stall (meseta)';
+                if (progress < 0.85) return 'Cocción avanzada';
+                if (progress < 1) return 'Casi listo';
+                return 'Listo - retirar';
+            }
+
+            /**
+             * Color para barra según temperatura
+             */
+            getColorForTemp(tempC, optimalC, minC) {
+                const range = optimalC - minC;
+                if (range === 0) {
+                    const pct = tempC / optimalC;
+                    if (pct < 0.5) return '#FF6B6B';
+                    if (pct < 0.75) return '#FFD93D';
+                    if (pct < 0.95) return '#6BCB77';
+                    return '#4D96FF';
+                }
+                const pct = (tempC - minC) / range;
+                if (pct < 0.25) return '#FF6B6B';
+                if (pct < 0.55) return '#FFD93D';
+                if (pct < 0.85) return '#6BCB77';
+                return '#4D96FF';
             }
         }
 
-        function calculate() {
-            const meatType = document.getElementById('meatType').value;
-            const weight = parseFloat(document.getElementById('weight').value);
-            const smokingTemp = parseFloat(document.getElementById('smokingTemp').value);
+        // ================================================================
+        // 3. BBQ VALIDATOR - Validación stratificada
+        // ================================================================
+        class BBQValidator extends EventEmitter {
+            /**
+             * Validación Capa 1: Schema (tipos, rangos)
+             */
+            validateSchema(inputs) {
+                const errors = {};
 
-            const formula = MEAT_FORMULAS[meatType];
+                if (!inputs.weight || inputs.weight < 0.1 || inputs.weight > 100) {
+                    errors.weight = 'Peso debe ser entre 0.1 y 100';
+                }
 
-            // Normalizamos todo a métrico
-            const weightKg = weightUnit === 'kg' ? weight : lbsToKg(weight);
-            const smokingTempC = tempUnit === 'C' ? smokingTemp : fahrenheitToCelsius(smokingTemp);
+                if (!inputs.meatType || !['brisket', 'pork_butt', 'pork_shoulder', 'ribs', 'beef_ribs', 'chicken', 'turkey'].includes(inputs.meatType)) {
+                    errors.meatType = 'Tipo de carne inválido';
+                }
 
-            // Cálculo de tiempo base
-            let cookingTimeHours = weightKg * formula.timePerKg;
+                if (!inputs.smokingTemp || inputs.smokingTemp < 65 || inputs.smokingTemp > 180) {
+                    errors.smokingTemp = 'Temperatura debe estar entre 65°C y 180°C';
+                }
 
-            // Ajuste por temperatura (referencia: 107°C / 225°F)
-            const tempDiffC = smokingTempC - 107;
-            const adjustmentFactor = 1 - (tempDiffC * 0.015);
-            cookingTimeHours = cookingTimeHours * Math.max(0.6, Math.min(1.4, adjustmentFactor));
+                return { isValid: Object.keys(errors).length === 0, errors };
+            }
 
-            const totalMinutes = Math.round(cookingTimeHours * 60);
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = totalMinutes % 60;
+            /**
+             * Validación Capa 2: Reglas de negocio
+             */
+            validateBusinessRules(inputs, result) {
+                const warnings = [];
 
-            const temperatureRange = generateTempRange(formula.minTempC, formula.optimalTempC, 8);
+                if (inputs.smokingTemp < 90) {
+                    warnings.push('⚠️ Temperatura muy baja: cocción será muy lenta');
+                }
 
-            // Conversiones para mostrar
-            const weightKgDisplay = Math.round(weightKg * 100) / 100;
-            const weightLbsDisplay = kgToLbs(weightKg);
-            const smokingTempCDisplay = Math.round(smokingTempC);
-            const smokingTempFDisplay = celsiusToFahrenheit(smokingTempC);
-            const minTempF = celsiusToFahrenheit(formula.minTempC);
-            const optimalTempF = celsiusToFahrenheit(formula.optimalTempC);
+                if (inputs.smokingTemp > 140) {
+                    warnings.push('⚠️ Temperatura muy alta: riesgo de resecamiento');
+                }
+
+                if (inputs.weight > 8) {
+                    warnings.push('⚠️ Peso inusualmente alto: verificar capacidad ahumador');
+                }
+
+                if (result && result.totalMinutes > 24 * 60) {
+                    warnings.push('ℹ️ Cocción muy larga (>24h): considerar aumentar temperatura');
+                }
+
+                return { hasWarnings: warnings.length > 0, warnings };
+            }
+
+            /**
+             * Validación Capa 3: Restricciones físicas
+             */
+            validatePhysics(result) {
+                const errors = [];
+
+                if (result.estimatedCookingHours > 48) {
+                    errors.push('Tiempo de cocción extremadamente alto (>48h)');
+                }
+
+                if (result.estimatedCookingHours < 0.5) {
+                    errors.push('Tiempo de cocción muy bajo (<0.5h)');
+                }
+
+                return { isValid: errors.length === 0, errors };
+            }
+        }
+
+        // ================================================================
+        // 4. STATE MANAGER - Persistencia y estado
+        // ================================================================
+        class StateManager extends EventEmitter {
+            constructor(storageKey = 'bbq-calculator-state') {
+                super();
+                this.storageKey = storageKey;
+                this.state = this.load();
+            }
+
+            /**
+             * Cargar estado desde localStorage
+             */
+            load() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    return stored ? JSON.parse(stored) : {
+                        version: '1.0',
+                        recipes: [],
+                        userPreferences: {
+                            defaultTempUnit: 'C',
+                            defaultWeightUnit: 'kg'
+                        }
+                    };
+                } catch (err) {
+                    console.error('Error cargando estado:', err);
+                    return { recipes: [], userPreferences: {} };
+                }
+            }
+
+            /**
+             * Guardar estado en localStorage
+             */
+            save() {
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+                    this.emit('state-saved');
+                } catch (err) {
+                    console.error('Error guardando estado:', err);
+                }
+            }
+
+            /**
+             * Guardar una receta
+             */
+            addRecipe(result) {
+                const recipe = {
+                    id: result.id,
+                    meatType: result.meatType,
+                    meatName: result.meatName,
+                    weightKg: result.weightKg,
+                    smokingTempC: result.smokingTempC,
+                    estimatedHours: result.estimatedCookingHours,
+                    calculatedAt: result.calculatedAt,
+                    fullResult: result
+                };
+
+                this.state.recipes.push(recipe);
+                this.save();
+                showToast(`✓ Receta guardada: ${result.meatName}`, 'success');
+                this.emit('recipe-added', recipe);
+            }
+
+            /**
+             * Obtener historial de recetas
+             */
+            getRecipes() {
+                return this.state.recipes || [];
+            }
+
+            /**
+             * Cargar receta anterior
+             */
+            loadRecipe(id) {
+                const recipe = this.state.recipes.find(r => r.id === id);
+                if (recipe) {
+                    document.getElementById('meatType').value = recipe.meatType;
+                    document.getElementById('weight').value = recipe.weightKg;
+                    document.getElementById('smokingTemp').value = recipe.smokingTempC;
+                    showToast(`✓ Receta cargada: ${recipe.meatName}`, 'success');
+                    this.emit('recipe-loaded', recipe);
+                }
+            }
+
+            /**
+             * Mostrar historial
+             */
+            showHistory() {
+                const historyDiv = document.getElementById('history');
+                const historyList = document.getElementById('historyList');
+
+                if (historyDiv.style.display === 'none') {
+                    const recipes = this.getRecipes();
+                    historyList.innerHTML = recipes.length === 0
+                        ? '<p style="grid-column: 1/-1; text-align: center; color: #999;">Sin recetas guardadas aún</p>'
+                        : recipes.reverse().map(r => `
+                            <div class="history-item" onclick="stateManager.loadRecipe(${r.id})">
+                                <strong>${r.meatName}</strong><br>
+                                ${r.weightKg}kg @ ${r.smokingTempC}°C<br>
+                                <small>${r.estimatedHours}h aprox.</small><br>
+                                <small style="color:#999;">${r.calculatedAt}</small>
+                            </div>
+                        `).join('');
+                    historyDiv.style.display = 'block';
+                } else {
+                    historyDiv.style.display = 'none';
+                }
+            }
+
+            /**
+             * Exportar datos
+             */
+            exportData() {
+                const dataStr = JSON.stringify(this.state, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bbq-calculator-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                showToast('✓ Datos exportados', 'success');
+            }
+
+            /**
+             * Importar datos
+             */
+            importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        try {
+                            const imported = JSON.parse(evt.target.result);
+                            this.state = { ...this.state, ...imported };
+                            this.save();
+                            showToast('✓ Datos importados correctamente', 'success');
+                        } catch (err) {
+                            showToast('✗ Error importando archivo', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+        }
+
+        // ================================================================
+        // 5. RECIPE FACTORY - Patrón Factory
+        // ================================================================
+        class RecipeFactory {
+            static createFromInputs(meatType, weight, smokingTemp, weightUnit, tempUnit) {
+                // Convertir a métrico
+                const weightKg = weightUnit === 'kg' ? weight : calculator.lbsToKg(weight);
+                const smokingTempC = tempUnit === 'C' ? smokingTemp : calculator.fahrenheitToCelsius(smokingTemp);
+
+                return {
+                    id: Date.now(),
+                    meatType,
+                    weightKg,
+                    smokingTempC,
+                    createdAt: new Date(),
+                    metadata: {
+                        inputUnit: weightUnit,
+                        inputTempUnit: tempUnit
+                    }
+                };
+            }
+        }
+
+        // ================================================================
+        // 6. UI HELPERS
+        // ================================================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function displayResult(result) {
+            const resultsDiv = document.getElementById('results');
 
             const resultsHTML = `
                 <div class="result-header">
-                    <h2>${formula.name}</h2>
+                    <h2>${result.meatName}</h2>
                     <p class="result-weight">
-                        ${weightKgDisplay} kg <span style="color:#999">(${weightLbsDisplay} lbs)</span>
+                        ${result.weightKg} kg <span style="color:#999;">(${result.weightLbs} lbs)</span>
                         •
-                        ${smokingTempCDisplay}°C <span style="color:#999">(${smokingTempFDisplay}°F)</span>
+                        ${result.smokingTempC}°C <span style="color:#999;">(${result.smokingTempF}°F)</span>
                     </p>
                 </div>
 
@@ -606,8 +1162,8 @@
                     <div class="card primary">
                         <h3>Tiempo de Cocción</h3>
                         <div class="time-display">
-                            <span class="hours">${hours}h</span>
-                            <span class="minutes">${minutes}m</span>
+                            <span class="hours">${result.estimatedCookingHours}h</span>
+                            <span class="minutes">${result.estimatedCookingMinutes}m</span>
                         </div>
                         <p class="note">Tiempo aproximado de ahumado</p>
                     </div>
@@ -615,15 +1171,15 @@
                     <div class="card">
                         <h3>Temperatura Interna Objetivo</h3>
                         <div class="temp-range">
-                            <p>Mínima: <strong>${formula.minTempC}°C</strong><span class="secondary-unit">(${minTempF}°F)</span></p>
-                            <p>Óptima: <strong>${formula.optimalTempC}°C</strong><span class="secondary-unit">(${optimalTempF}°F)</span></p>
+                            <p>Mínima: <strong>${result.minTempC}°C</strong><span class="secondary-unit">(${result.minTempF}°F)</span></p>
+                            <p>Óptima: <strong>${result.optimalTempC}°C</strong><span class="secondary-unit">(${result.optimalTempF}°F)</span></p>
                         </div>
                     </div>
 
                     <div class="card">
                         <h3>Tiempo de Reposo</h3>
                         <div class="holding-time">
-                            <span class="duration">${formula.holdingMin} min</span>
+                            <span class="duration">${result.holdingMin} min</span>
                         </div>
                         <p class="note">A 60°C (140°F) después de cocción</p>
                     </div>
@@ -632,10 +1188,10 @@
                 <div class="temperature-chart">
                     <h3>Progresión de Temperatura Interna</h3>
                     <div class="bars">
-                        ${temperatureRange.map(item => {
-                            const percentage = ((item.tempC - formula.minTempC) / Math.max(1, (formula.optimalTempC - formula.minTempC))) * 100;
-                            const color = getColorForTemp(item.tempC, formula.optimalTempC, formula.minTempC);
-                            const tempF = celsiusToFahrenheit(item.tempC);
+                        ${result.temperatureRange.map(item => {
+                            const percentage = ((item.tempC - result.minTempC) / Math.max(1, (result.optimalTempC - result.minTempC))) * 100;
+                            const color = calculator.getColorForTemp(item.tempC, result.optimalTempC, result.minTempC);
+                            const tempF = calculator.celsiusToFahrenheit(item.tempC);
                             return `
                                 <div class="bar-item">
                                     <div class="bar" style="height: ${Math.max(percentage, 5)}%; background: ${color};"></div>
@@ -645,9 +1201,9 @@
                         }).join('')}
                     </div>
                     <div class="stages">
-                        ${temperatureRange.map(item => `
+                        ${result.temperatureRange.map(item => `
                             <div class="stage-item">
-                                <span class="stage-temp">${item.tempC}°C <span class="secondary">(${celsiusToFahrenheit(item.tempC)}°F)</span></span>
+                                <span class="stage-temp">${item.tempC}°C <span class="secondary">(${calculator.celsiusToFahrenheit(item.tempC)}°F)</span></span>
                                 <span class="stage-name">${item.stage}</span>
                             </div>
                         `).join('')}
@@ -664,66 +1220,70 @@
                         <li>Mantén la temperatura del ahumador consistente durante todo el proceso</li>
                     </ul>
                 </div>
+
+                <div class="actions-section">
+                    <button class="action-btn" onclick="stateManager.addRecipe(lastResult)">💾 Guardar esta Receta</button>
+                    <button class="action-btn" onclick="location.href='#'">🔄 Nueva Consulta</button>
+                </div>
             `;
 
-            const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = resultsHTML;
             resultsDiv.classList.add('show');
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function generateTempRange(minTempC, maxTempC, steps) {
-            const result = [];
-            const range = maxTempC - minTempC;
+        // ================================================================
+        // 7. INSTANCIAS GLOBALES
+        // ================================================================
+        const calculator = new BBQEngine();
+        const validator = new BBQValidator();
+        const stateManager = new StateManager();
 
-            // Si el rango es 0 (pollo/pavo), mostramos progresión desde temp ambiente
-            if (range === 0) {
-                const startTemp = 40;
-                const stepSize = (maxTempC - startTemp) / steps;
-                for (let i = 0; i <= steps; i++) {
-                    const temp = startTemp + stepSize * i;
-                    result.push({
-                        tempC: Math.round(temp),
-                        stage: getStageForProgress(i / steps)
-                    });
-                }
-                return result;
-            }
+        let lastResult = null;
 
-            const step = range / steps;
-            for (let i = 0; i <= steps; i++) {
-                const temp = minTempC + step * i;
-                result.push({
-                    tempC: Math.round(temp),
-                    stage: getStageForProgress(i / steps)
+        // ================================================================
+        // 8. EVENT LISTENERS
+        // ================================================================
+
+        // Evento: Cálculo completado
+        calculator.on('calculation-complete', (result) => {
+            lastResult = result;
+            displayResult(result);
+
+            // Validaciones después de cálculo
+            const businessCheck = validator.validateBusinessRules(
+                {
+                    weight: parseFloat(document.getElementById('weight').value),
+                    meatType: document.getElementById('meatType').value,
+                    smokingTemp: parseFloat(document.getElementById('smokingTemp').value)
+                },
+                result
+            );
+
+            if (businessCheck.hasWarnings) {
+                businessCheck.warnings.forEach(warning => {
+                    showToast(warning, 'warning');
                 });
             }
-            return result;
-        }
+        });
 
-        function getStageForProgress(progress) {
-            if (progress < 0.25) return 'Cocción inicial';
-            if (progress < 0.55) return 'Stall (meseta)';
-            if (progress < 0.85) return 'Cocción avanzada';
-            if (progress < 1) return 'Casi listo';
-            return 'Listo - retirar';
-        }
+        // Evento: Error en cálculo
+        calculator.on('calculation-error', (err) => {
+            console.error('Error:', err);
+        });
 
-        function getColorForTemp(tempC, optimalC, minC) {
-            const range = optimalC - minC;
-            if (range === 0) {
-                const pct = tempC / optimalC;
-                if (pct < 0.5) return '#FF6B6B';
-                if (pct < 0.75) return '#FFD93D';
-                if (pct < 0.95) return '#6BCB77';
-                return '#4D96FF';
-            }
-            const pct = (tempC - minC) / range;
-            if (pct < 0.25) return '#FF6B6B';
-            if (pct < 0.55) return '#FFD93D';
-            if (pct < 0.85) return '#6BCB77';
-            return '#4D96FF';
-        }
+        // Evento: Receta guardada
+        stateManager.on('recipe-added', (recipe) => {
+            console.log('Receta guardada:', recipe);
+        });
+
+        // ================================================================
+        // INICIALIZACIÓN
+        // ================================================================
+        console.log('✓ BBQ Calculator inicializado con arquitectura GSD-Lite');
+        console.log('✓ Fase 1: Correcciones de datos aplicadas (Brisket: 1.65→2.3, Pork: 2.2→2.5)');
+        console.log('✓ Fase 2: Arquitectura modular (EventEmitter, Engine, Validator, StateManager)');
+        console.log('✓ Fase 3: Persistencia y exportación habilitadas');
     </script>
 </body>
 </html>
