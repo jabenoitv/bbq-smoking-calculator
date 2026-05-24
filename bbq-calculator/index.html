@@ -464,6 +464,176 @@
             }
         }
 
+        .bacon-cure-section {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+            border-left: 4px solid #c2185b;
+        }
+
+        .bacon-cure-section h3 {
+            color: #880e4f;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .cure-subtitle {
+            color: #6a1b4a;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .cure-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .cure-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cure-card {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .cure-card h4 {
+            color: #880e4f;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .cure-card.cure-safety {
+            background: #fff9c4;
+            border-left: 3px solid #fbc02d;
+        }
+
+        .cure-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        .cure-table td {
+            padding: 8px 4px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .cure-table tr.cure-total td {
+            border-top: 2px solid #c2185b;
+            border-bottom: none;
+            color: #880e4f;
+            font-weight: 700;
+            padding-top: 10px;
+        }
+
+        .cure-pct {
+            color: #999;
+            font-size: 0.85em;
+            text-align: right;
+        }
+
+        .cure-time-main {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cure-time .big-number {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #c2185b;
+        }
+
+        .cure-time-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .cure-time-range {
+            color: #6a1b4a;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .cure-time-formula {
+            color: #999;
+            font-size: 0.8em;
+            font-style: italic;
+        }
+
+        .safety-note {
+            color: #5d4037;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .cure-process {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .cure-process h4 {
+            color: #880e4f;
+            margin-bottom: 12px;
+        }
+
+        .process-list {
+            padding-left: 22px;
+        }
+
+        .process-list li {
+            margin: 10px 0;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .cure-warnings {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        .cure-warnings h4 {
+            color: #c62828;
+            margin-bottom: 12px;
+        }
+
+        .cure-warnings ul {
+            padding-left: 22px;
+        }
+
+        .cure-warnings li {
+            margin: 8px 0;
+            line-height: 1.5;
+            color: #5d2020;
+        }
+
+        @media (max-width: 768px) {
+            .cure-inputs {
+                grid-template-columns: 1fr;
+            }
+            .cure-results {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .history-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -536,6 +706,9 @@
                     <optgroup label="Ave">
                         <option value="pollo_entero">Pollo Entero (Whole Chicken)</option>
                         <option value="pavo_entero">Pavo Entero (Whole Turkey)</option>
+                    </optgroup>
+                    <optgroup label="Curados">
+                        <option value="panceta">Panceta / Bacon (Pork Belly)</option>
                     </optgroup>
                 </select>
             </div>
@@ -698,6 +871,15 @@
                         optimalTempC: 74,
                         holdingMin: 20,
                         description: 'Pavo para fiestas. Considerar inyección de líquidos.'
+                    },
+                    panceta: {
+                        name: 'Panceta / Bacon (Pork Belly)',
+                        timePerKg: 1.5,
+                        minTempC: 65,
+                        optimalTempC: 68,
+                        holdingMin: 0,
+                        description: 'Pork belly para hacer bacon casero. Curado previo necesario (ver calculadora de cura).',
+                        needsCure: true
                     }
                 };
             }
@@ -918,7 +1100,7 @@
                     errors.weight = 'Peso debe ser entre 0.1 y 100';
                 }
 
-                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero'];
+                const validTypes = ['tapapecho', 'plateada', 'punta_ganso', 'asado_tira', 'paleta_cerdo', 'costillar_cerdo', 'pollo_entero', 'pavo_entero', 'panceta'];
                 if (!inputs.meatType || !validTypes.includes(inputs.meatType)) {
                     errors.meatType = 'Tipo de carne inválido';
                 }
@@ -1148,6 +1330,161 @@
         }
 
         // ================================================================
+        // 5b. BACON CURE CALCULATOR
+        // Estándar USDA Equilibrium Cure - 156 ppm nitrito max seguro
+        // Fuentes: eatcuredmeat.com, USDA, Ruhlman method
+        // ================================================================
+        class BaconCureCalculator {
+            constructor() {
+                // Porcentajes estándar del peso de la carne
+                this.SALT_PERCENT = 2.5;        // 2-2.75% rango seguro
+                this.PINK_SALT_PERCENT = 0.25;  // = 156 ppm nitrito (USDA max)
+                this.SUGAR_PERCENT = 1.0;       // 1-1.5% para sabor
+                this.SAFETY_BUFFER_DAYS = 2;    // Buffer para equilibrium
+            }
+
+            /**
+             * Calcula receta de cura para bacon
+             * @param {number} weightKg - Peso del pork belly en kg
+             * @param {number} thicknessCm - Grosor del corte en cm
+             * @param {Object} options - { salt%, sugar%, includeSugar }
+             */
+            calculate(weightKg, thicknessCm, options = {}) {
+                const weightG = weightKg * 1000;
+                const saltPct = options.saltPercent || this.SALT_PERCENT;
+                const sugarPct = options.sugarPercent || this.SUGAR_PERCENT;
+                const includeSugar = options.includeSugar !== false;
+
+                // Cálculos en gramos
+                const saltGrams = (weightG * saltPct) / 100;
+                const pinkSaltGrams = (weightG * this.PINK_SALT_PERCENT) / 100;
+                const sugarGrams = includeSugar ? (weightG * sugarPct) / 100 : 0;
+
+                // Tiempo de curado: 1 día por cada 6mm (0.6cm) de grosor + buffer
+                const cureDays = Math.ceil(thicknessCm / 0.6) + this.SAFETY_BUFFER_DAYS;
+                const cureDaysMin = Math.max(5, Math.ceil(thicknessCm / 0.6));
+                const cureDaysMax = cureDays + 2;
+
+                // PPM de nitrito (siempre 156 con 0.25% Pink Salt #1)
+                const nitritePPM = 156;
+
+                return {
+                    weightKg,
+                    weightG,
+                    thicknessCm,
+                    saltGrams: Math.round(saltGrams * 10) / 10,
+                    pinkSaltGrams: Math.round(pinkSaltGrams * 100) / 100,
+                    sugarGrams: Math.round(sugarGrams * 10) / 10,
+                    cureDaysMin,
+                    cureDaysRecommended: cureDays,
+                    cureDaysMax,
+                    nitritePPM,
+                    saltPct,
+                    sugarPct,
+                    includeSugar,
+                    totalCureGrams: Math.round((saltGrams + pinkSaltGrams + sugarGrams) * 10) / 10
+                };
+            }
+
+            /**
+             * Genera HTML para mostrar receta de cura
+             */
+            renderRecipe(cure) {
+                return `
+                    <div class="bacon-cure-section">
+                        <h3>🥓 Calculadora de Cura para Bacon</h3>
+                        <p class="cure-subtitle">Método Equilibrium Cure (USDA - 156 ppm nitrito)</p>
+
+                        <div class="cure-inputs">
+                            <div class="form-group">
+                                <label for="thicknessInput">Grosor de la panceta (cm)</label>
+                                <input id="thicknessInput" type="number" value="${cure.thicknessCm}" min="1" max="10" step="0.5" onchange="recalculateCure()">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="includeSugar" ${cure.includeSugar ? 'checked' : ''} onchange="recalculateCure()">
+                                    Incluir azúcar (sabor)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="cure-results">
+                            <div class="cure-card">
+                                <h4>🧂 Ingredientes (para ${cure.weightKg} kg)</h4>
+                                <table class="cure-table">
+                                    <tr>
+                                        <td>Sal de mar</td>
+                                        <td><strong>${cure.saltGrams} g</strong></td>
+                                        <td class="cure-pct">${cure.saltPct}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pink Salt #1 (Prague Powder)</td>
+                                        <td><strong>${cure.pinkSaltGrams} g</strong></td>
+                                        <td class="cure-pct">0.25%</td>
+                                    </tr>
+                                    ${cure.includeSugar ? `
+                                    <tr>
+                                        <td>Azúcar morena</td>
+                                        <td><strong>${cure.sugarGrams} g</strong></td>
+                                        <td class="cure-pct">${cure.sugarPct}%</td>
+                                    </tr>` : ''}
+                                    <tr class="cure-total">
+                                        <td>Total cura</td>
+                                        <td><strong>${cure.totalCureGrams} g</strong></td>
+                                        <td>—</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="cure-card">
+                                <h4>⏱️ Tiempo de Curado</h4>
+                                <div class="cure-time">
+                                    <div class="cure-time-main">
+                                        <span class="big-number">${cure.cureDaysRecommended}</span>
+                                        <span class="cure-time-label">días recomendados</span>
+                                    </div>
+                                    <p class="cure-time-range">Rango seguro: ${cure.cureDaysMin}–${cure.cureDaysMax} días</p>
+                                    <p class="cure-time-formula">📐 Fórmula: 1 día por cada 6mm grosor + 2 días buffer</p>
+                                </div>
+                            </div>
+
+                            <div class="cure-card cure-safety">
+                                <h4>⚠️ Seguridad</h4>
+                                <p><strong>${cure.nitritePPM} ppm nitrito</strong> (USDA max: 200 ppm)</p>
+                                <p class="safety-note">Nivel seguro garantizado con 0.25% Pink Salt #1</p>
+                            </div>
+                        </div>
+
+                        <div class="cure-process">
+                            <h4>📋 Proceso Paso a Paso</h4>
+                            <ol class="process-list">
+                                <li><strong>Mezcla la cura:</strong> Combina sal, Pink Salt #1 ${cure.includeSugar ? 'y azúcar' : ''} en un bowl.</li>
+                                <li><strong>Aplica la cura:</strong> Frota toda la mezcla sobre la panceta, cubriendo TODA la superficie.</li>
+                                <li><strong>Bolsa hermética:</strong> Pon la panceta en bolsa Ziploc o al vacío. Saca todo el aire posible.</li>
+                                <li><strong>Refrigera:</strong> ${cure.cureDaysRecommended} días a 2-4°C. Voltea la bolsa diariamente.</li>
+                                <li><strong>Enjuaga:</strong> Lava bien bajo agua fría para quitar exceso de sal. Seca con papel.</li>
+                                <li><strong>Forma pellicle:</strong> Reposa en heladera sin tapar 12-24h para formar superficie pegajosa.</li>
+                                <li><strong>Ahúma:</strong> A 65-90°C hasta interna 65°C (~2-4h). Usa madera de manzano, cerezo o nogal.</li>
+                                <li><strong>Enfría:</strong> Refrigera mínimo 12h antes de cortar. Mejora con el reposo.</li>
+                            </ol>
+                        </div>
+
+                        <div class="cure-warnings">
+                            <h4>⚠️ Advertencias Importantes</h4>
+                            <ul>
+                                <li><strong>Pink Salt #1 es OBLIGATORIO</strong> para prevenir botulismo. NO uses sal regular sola.</li>
+                                <li>Pink Salt #1 es ROSADO (Prague Powder #1), NO confundir con sal del Himalaya.</li>
+                                <li>NUNCA excedas 0.25% del peso de carne (200 ppm es límite USDA).</li>
+                                <li>Mantén siempre refrigerado durante curado (2-4°C).</li>
+                                <li>Si la panceta huele mal o tiene textura viscosa, descártala.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ================================================================
         // 6. UI HELPERS
         // ================================================================
         function showToast(message, type = 'info') {
@@ -1241,11 +1578,34 @@
                     <button class="action-btn" onclick="stateManager.addRecipe(lastResult)">💾 Guardar esta Receta</button>
                     <button class="action-btn" onclick="location.href='#'">🔄 Nueva Consulta</button>
                 </div>
+
+                ${result.formula.needsCure ? renderCureSection(result.weightKg) : ''}
             `;
 
             resultsDiv.innerHTML = resultsHTML;
             resultsDiv.classList.add('show');
             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderCureSection(weightKg) {
+            const defaultThickness = 3.0;
+            const cure = baconCure.calculate(weightKg, defaultThickness, { includeSugar: true });
+            return baconCure.renderRecipe(cure);
+        }
+
+        function recalculateCure() {
+            const thicknessInput = document.getElementById('thicknessInput');
+            const sugarCheckbox = document.getElementById('includeSugar');
+            if (!thicknessInput || !lastResult) return;
+
+            const thickness = parseFloat(thicknessInput.value) || 3.0;
+            const includeSugar = sugarCheckbox ? sugarCheckbox.checked : true;
+
+            const cure = baconCure.calculate(lastResult.weightKg, thickness, { includeSugar });
+            const cureContainer = document.querySelector('.bacon-cure-section');
+            if (cureContainer) {
+                cureContainer.outerHTML = baconCure.renderRecipe(cure);
+            }
         }
 
         // ================================================================
@@ -1254,6 +1614,7 @@
         const calculator = new BBQEngine();
         const validator = new BBQValidator();
         const stateManager = new StateManager();
+        const baconCure = new BaconCureCalculator();
 
         let lastResult = null;
 
