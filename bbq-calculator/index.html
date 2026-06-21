@@ -1051,8 +1051,8 @@
         }
 
         .tab-btn {
-            flex: 1;
-            min-width: 100px;
+            flex: 1 1 auto;
+            min-width: max-content;
             padding: 11px 10px;
             background: transparent;
             color: var(--text-muted);
@@ -1063,6 +1063,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
+            text-align: center;
         }
 
         .tab-btn:hover {
@@ -1405,10 +1406,18 @@
         }
 
         @media (max-width: 768px) {
+            .tabs-nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+                overflow-x: visible;
+            }
             .tab-btn {
                 font-size: 0.8em;
-                min-width: 80px;
+                min-width: 0;
                 padding: 10px 6px;
+                white-space: normal;
+                line-height: 1.2;
             }
             .gadgets-grid {
                 grid-template-columns: 1fr;
