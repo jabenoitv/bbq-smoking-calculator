@@ -1594,7 +1594,7 @@
                         <p>Selecciona el tipo de carne para obtener tiempos precisos</p>
                     </div>
                     <div class="form-group">
-                        <select id="meatType">
+                        <select id="meatType" onchange="wizardUI.updateTempSelector()">
                             <optgroup label="🐄 Vacuno">
                                 <option value="tapapecho">Tapapecho (Brisket)</option>
                                 <option value="plateada">Plateada</option>
@@ -1654,6 +1654,36 @@
                             <button class="unit-toggle" onclick="calculator.toggleTempUnit(); wizardUI.updateDisplay()" id="tempUnitBtn">°C</button>
                         </div>
                     </div>
+
+                    <!-- Temperature Selector: How red do you want it? -->
+                    <div class="form-group" id="desiredTempSection" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
+                        <label style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            🔴 ¿Qué tan rojo quieres la carne?
+                            <span style="font-size: 0.85em; color: var(--text-muted);">(Opcional - ajusta aquí)</span>
+                        </label>
+                        <p style="font-size: 0.85em; color: var(--text-muted); margin: 8px 0 12px 0;">
+                            Elige qué tan jugosa: rojo frío (55°C) → rojo cálido (70°C)
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="range" id="desiredTempSlider" min="55" max="70" value="63" step="1"
+                                   style="flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(to right, #ff6b6b, #ff9999, #ffcccc); outline: none; -webkit-appearance: slider-thumb;">
+                            <div style="display: flex; align-items: baseline; gap: 8px; min-width: 100px;">
+                                <span id="desiredTempDisplay" style="font-size: 1.3em; font-weight: 700; color: #ff7a3d; min-width: 45px;">63°C</span>
+                                <span style="font-size: 0.75em; color: var(--text-dim);">
+                                    <span id="desiredTempState">Rojo (típico)</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; font-size: 0.75em; color: var(--text-dim);">
+                            <div style="text-align: left;">Frío (55°C)</div>
+                            <div style="text-align: center;">Medio (60-65°C)</div>
+                            <div style="text-align: right;">Cálido (70°C)</div>
+                        </div>
+                        <div id="poultryLockMessage" style="display: none; margin-top: 12px; padding: 10px; background: rgba(108, 186, 108, 0.15); border-left: 3px solid #6cba6c; border-radius: 4px; font-size: 0.8em; color: #6cba6c;">
+                            🔒 Aves (pollo/pavo): Bloqueado en 72-73°C (seguridad alimentaria)
+                        </div>
+                    </div>
+
                     <div class="wizard-nav">
                         <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
                         <button class="wizard-btn-next" onclick="wizardUI.nextStep()">Siguiente →</button>
@@ -1904,6 +1934,7 @@
                 super();
                 this.weightUnit = 'kg';
                 this.tempUnit = 'C';
+                this.userDesiredRedTemp = null; // User-selected red temp (55-70°C), null = use formula default
             }
 
             /**
@@ -2151,7 +2182,9 @@
                         : stallMinutes;
 
                     // FASE 3: RENDERIZACIÓN (68°C → objetivo rojo/jugoso) - Rápido
-                    const pushTempDiff = formula.desiredRedTempC - 68;
+                    // Usar temperatura seleccionada por usuario si está disponible, sino usar la del formula
+                    const finalDesiredTempC = this.userDesiredRedTemp || formula.desiredRedTempC;
+                    const pushTempDiff = finalDesiredTempC - 68;
                     const pushMinutes = pushTempDiff / formula.pushUpRate;
 
                     // Total
@@ -2188,7 +2221,7 @@
                         },
                         {
                             at: totalMinutes,
-                            msg: `✅ RENDERIZACIÓN LISTA @ ${formula.desiredRedTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
+                            msg: `✅ RENDERIZACIÓN LISTA @ ${finalDesiredTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
                             phase: 'done'
                         }
                     ];
@@ -2212,13 +2245,13 @@
                         {
                             name: 'Renderización',
                             duration: Math.round(pushMinutes),
-                            tempRange: [68, formula.desiredRedTempC],
+                            tempRange: [68, finalDesiredTempC],
                             percent: (pushMinutes / totalMinutes) * 100
                         }
                     ];
 
                     // Generar progresión de temperatura (25°C → temp rojo/jugosa)
-                    const temperatureRange = this.generateTempRange(25, formula.desiredRedTempC, 8);
+                    const temperatureRange = this.generateTempRange(25, finalDesiredTempC, 8);
 
                     // Resultado final
                     const result = {
@@ -2234,8 +2267,9 @@
                         totalMinutes: totalMinutes,
                         minTempC: 25,
                         minTempF: this.celsiusToFahrenheit(25),
-                        desiredRedTempC: formula.desiredRedTempC,
-                        desiredRedTempF: this.celsiusToFahrenheit(formula.desiredRedTempC),
+                        desiredRedTempC: finalDesiredTempC,
+                        desiredRedTempF: this.celsiusToFahrenheit(finalDesiredTempC),
+                        userSelected: this.userDesiredRedTemp !== null, // true if user customized
                         holdingMin: formula.holdingMin,
                         temperatureRange: temperatureRange,
                         // NUEVO: Datos de fases y eventos
@@ -3060,7 +3094,7 @@
                 <!-- Quick Info: 2-column grid -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 15px 0;">
                     <div class="card" style="padding: 15px;">
-                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🔴 Temp. Rojo/Jugoso</h4>
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🔴 Temp. Rojo/Jugoso ${result.userSelected ? '<span style="font-size: 0.7em; background: rgba(255,122,61,0.2); padding: 2px 6px; border-radius: 3px; margin-left: 4px;">personalizado</span>' : ''}</h4>
                         <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.desiredRedTempC}°C</p>
                         <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.desiredRedTempF}°F) Carne rosada/roja</p>
                     </div>
@@ -3456,6 +3490,24 @@
                     if (e.key === 'ArrowLeft') this.prevStep();
                 });
 
+                // Set up temperature selector (Phase 4)
+                const desiredTempSlider = document.getElementById('desiredTempSlider');
+                if (desiredTempSlider) {
+                    desiredTempSlider.addEventListener('input', (e) => {
+                        const temp = parseInt(e.target.value);
+                        calculator.userDesiredRedTemp = temp;
+
+                        // Update display
+                        document.getElementById('desiredTempDisplay').textContent = temp + '°C';
+
+                        // Update state label
+                        let state = 'Rojo (típico)';
+                        if (temp <= 57) state = 'Rojo Frío';
+                        else if (temp >= 68) state = 'Rojo Cálido';
+                        document.getElementById('desiredTempState').textContent = state;
+                    });
+                }
+
                 // Show onboarding on first visit
                 if (this.isFirstVisit) {
                     setTimeout(() => this.showOnboarding(), 500);
@@ -3532,7 +3584,38 @@
                 setTimeout(() => {
                     this.goToStep(1);
                     this.setWrap(false);
+                    calculator.userDesiredRedTemp = null; // Reset user temp selection
                 }, 500);
+            }
+
+            updateTempSelector() {
+                // Show/hide temperature selector based on meat type
+                const meatType = document.getElementById('meatType').value;
+                const isPoultry = meatType === 'pollo_entero' || meatType === 'pavo_entero';
+
+                const section = document.getElementById('desiredTempSection');
+                const slider = document.getElementById('desiredTempSlider');
+                const lockMessage = document.getElementById('poultryLockMessage');
+
+                if (isPoultry) {
+                    // Hide slider for poultry, show lock message
+                    slider.style.display = 'none';
+                    document.querySelector('[id="desiredTempState"]').parentElement.style.display = 'none';
+                    lockMessage.style.display = 'block';
+                    calculator.userDesiredRedTemp = null; // Reset
+                } else {
+                    // Show slider for beef/pork
+                    slider.style.display = 'block';
+                    document.querySelector('[id="desiredTempState"]').parentElement.style.display = 'inline';
+                    lockMessage.style.display = 'none';
+
+                    // Reset to default based on meat type
+                    const formulas = calculator.getMeatFormulas();
+                    const defaultTemp = formulas[meatType]?.desiredRedTempC || 63;
+                    slider.value = defaultTemp;
+                    document.getElementById('desiredTempDisplay').textContent = defaultTemp + '°C';
+                    calculator.userDesiredRedTemp = null; // Reset (user hasn't adjusted yet)
+                }
             }
 
             focusInputOnStep() {
