@@ -296,6 +296,68 @@
             animation: fadeIn 0.2s ease-out;
         }
 
+        /* Collapsible Sections */
+        .collapsible-section {
+            margin: 12px 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--surface-2);
+            transition: all 0.2s ease;
+        }
+
+        .collapsible-header {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--surface-3);
+            border: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .collapsible-header:hover {
+            background: var(--surface);
+            color: var(--accent);
+        }
+
+        .collapsible-icon {
+            display: inline-block;
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-section.open .collapsible-header {
+            background: rgba(226, 88, 34, 0.1);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .collapsible-content {
+            padding: 15px 16px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .collapsible-section.open .collapsible-content {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+
         .wizard-nav {
             display: flex;
             gap: 12px;
@@ -2904,6 +2966,21 @@
         function displayResult(result) {
             const resultsDiv = document.getElementById('results');
 
+            // Crear secciones colapsables
+            const createCollapsible = (id, title, icon, content, isOpen = false) => {
+                return `
+                    <div class="collapsible-section" id="${id}">
+                        <button class="collapsible-header ${isOpen ? 'open' : ''}" onclick="document.getElementById('${id}').classList.toggle('open')">
+                            <span class="collapsible-icon">${isOpen ? '▼' : '▶'}</span>
+                            <span class="collapsible-title">${icon} ${title}</span>
+                        </button>
+                        <div class="collapsible-content" style="display: ${isOpen ? 'block' : 'none'};">
+                            ${content}
+                        </div>
+                    </div>
+                `;
+            };
+
             // Formatear tiempo de evento
             const formatTime = (minutes) => {
                 const h = Math.floor(minutes / 60);
@@ -2959,6 +3036,7 @@
                     </p>
                 </div>
 
+                <!-- MAIN: Quick Summary Card -->
                 <div class="result-cards">
                     <div class="card primary">
                         <h3>⏱️ Tiempo Total de Cocción</h3>
@@ -2968,38 +3046,34 @@
                         </div>
                         <p class="note">Modelo de Terneza (BBQtrail)</p>
                     </div>
+                </div>
 
-                    <div class="card">
-                        <h3>🌡️ Temperatura Interna Objetivo</h3>
-                        <div class="temp-range">
-                            <p>Mínima: <strong>${result.minTempC}°C</strong><span class="secondary-unit">(${result.minTempF}°F)</span></p>
-                            <p>Óptima: <strong>${result.optimalTempC}°C</strong><span class="secondary-unit">(${result.optimalTempF}°F)</span></p>
-                        </div>
+                <!-- Quick Info: 2-column grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 15px 0;">
+                    <div class="card" style="padding: 15px;">
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🌡️ Temp. Objetivo</h4>
+                        <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.optimalTempC}°C</p>
+                        <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.optimalTempF}°F)</p>
                     </div>
-
-                    <div class="card">
-                        <h3>⏸️ Tiempo de Reposo</h3>
-                        <div class="holding-time">
-                            <span class="duration">${result.holdingMin} min</span>
-                        </div>
-                        <p class="note">A 60-70°C después de cocción</p>
+                    <div class="card" style="padding: 15px;">
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">⏸️ Reposo</h4>
+                        <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.holdingMin} min</p>
+                        <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">60-70°C</p>
                     </div>
                 </div>
 
-                <!-- NUEVAS SECCIONES: FASES Y TIMELINE -->
-                <div style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 15px;">📊 LAS 3 FASES DE COCCIÓN</h3>
+                <!-- COLLAPSIBLE SECTIONS -->
+                ${createCollapsible('phases-section', 'Las 3 Fases de Cocción', '📊', `
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
                         ${phasesHTML}
                     </div>
-                </div>
+                `, false)}
 
-                <div style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 15px;">🎯 TIMELINE DE EVENTOS</h3>
+                ${createCollapsible('timeline-section', 'Timeline de Eventos', '🎯', `
                     <div style="max-width: 100%; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 15px;">
                         ${eventsHTML}
                     </div>
-                </div>
+                `, false)}
 
                 <div class="temperature-chart">
                     <h3>Progresión de Temperatura Interna</h3>
