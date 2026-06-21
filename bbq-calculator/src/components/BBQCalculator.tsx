@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   calculateCookingTime,
   celsiusToFahrenheit,
@@ -137,7 +137,7 @@ export function BBQCalculator() {
             <h3>Progresión de Temperatura Interna</h3>
             <div className="chart-container">
               <div className="bars">
-                {result.temperatureRange.map((item, index) => {
+                {result.temperatureRange.map((item: { temp: number; stage: string }, index: number) => {
                   const percentage = ((item.temp - result.minInternalTemp) /
                     (result.optimalInternalTemp - result.minInternalTemp)) * 100
                   return (
@@ -156,7 +156,7 @@ export function BBQCalculator() {
               </div>
             </div>
             <div className="stages">
-              {result.temperatureRange.map((item, index) => (
+              {result.temperatureRange.map((item: { temp: number; stage: string }, index: number) => (
                 <div key={index} className="stage-item">
                   <span className="stage-temp">{item.temp}°F:</span>
                   <span className="stage-name">{item.stage}</span>

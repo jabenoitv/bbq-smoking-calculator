@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "cashclaw-agent": "^0.1.0",
+    "jsdom": "^29.1.1",
     "moltlaunch": "latest",
     "playwright": "^1.60.0"
   }

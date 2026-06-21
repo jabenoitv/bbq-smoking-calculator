@@ -68,7 +68,7 @@ const MEAT_FORMULAS: Record<MeatType, MeatFormula> = {
   },
 };
 
-interface CookingResult {
+export type CookingResult = {
   meatName: string;
   weightLbs: number;
   weightKg: number;
@@ -92,7 +92,6 @@ export function calculateCookingTime(
   const weightKg = isKg ? weight : weight / 2.20462;
 
   const cookingTimeHours = weightLbs * formula.timePerPound;
-  const cookingTimeMinutes = Math.round(cookingTimeHours * 60);
 
   // Ajuste por temperatura de ahumado
   const tempAdjustment = (smokingTempF - 225) / 25; // -1 por cada 25°F menos
