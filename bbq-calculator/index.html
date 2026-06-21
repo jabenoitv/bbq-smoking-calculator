@@ -1929,17 +1929,17 @@
                         // Fase 2: Stall (62-68°C) - LA CLAVE
                         stallBaseHours: 4.0,  // Brisket 1kg @ 107°C tarda ~4h en stall
                         stallRetardationFactor: 2.5,  // stall tarda 2.5x que ramp-up
-                        // Fase 3: Push (68→96°C)
+                        // Fase 3: Renderización (68→63°C, carne roja y jugosa)
                         pushUpRate: 0.25,  // °C/min
                         // Bark & Wrap
                         barkFormationHours: 2.5,
                         wrapDecisionTempC: 63,
                         wrapAccelerationFactor: 0.65,  // envuelto: 35% menos tiempo
                         // Temperaturas
-                        minTempC: 88,
-                        optimalTempC: 96,
+                        minTempC: 25,
+                        desiredRedTempC: 63,
                         holdingMin: 60,
-                        description: 'Brisket chileno. Largo stall (terneza).'
+                        description: 'Brisket chileno. Corteza gruesa, interior rojo y jugoso.'
                     },
                     plateada: {
                         name: 'Plateada',
@@ -1950,10 +1950,10 @@
                         barkFormationHours: 2.2,
                         wrapDecisionTempC: 63,
                         wrapAccelerationFactor: 0.65,
-                        minTempC: 88,
-                        optimalTempC: 96,
+                        minTempC: 25,
+                        desiredRedTempC: 63,
                         holdingMin: 45,
-                        description: 'Más blanda, stall ligeramente más corto.'
+                        description: 'Plateada: Corteza gruesa, interior rojo y jugoso. Stall ligeramente más corto.'
                     },
                     punta_ganso: {
                         name: 'Punta de Ganso (Picaña)',
@@ -1964,10 +1964,10 @@
                         barkFormationHours: 1.5,
                         wrapDecisionTempC: 55,
                         wrapAccelerationFactor: 0.70,
-                        minTempC: 54,
-                        optimalTempC: 60,
+                        minTempC: 25,
+                        desiredRedTempC: 62,
                         holdingMin: 15,
-                        description: 'Picaña premium, stall corto, NO fall-apart.'
+                        description: 'Picaña: Término medio-raro, corteza crujiente. Stall corto, NO fall-apart.'
                     },
                     asado_tira: {
                         name: 'Asado de Tira (Short Ribs)',
@@ -1978,10 +1978,10 @@
                         barkFormationHours: 2.3,
                         wrapDecisionTempC: 63,
                         wrapAccelerationFactor: 0.65,
-                        minTempC: 88,
-                        optimalTempC: 96,
+                        minTempC: 25,
+                        desiredRedTempC: 65,
                         holdingMin: 30,
-                        description: 'Short ribs, cocción larga similar a brisket.'
+                        description: 'Short Ribs: Corteza gruesa, interior rojo y tierno. Cocción larga similar a brisket.'
                     },
                     paleta_cerdo: {
                         name: 'Paleta de Cerdo (Pork Shoulder)',
@@ -1992,10 +1992,10 @@
                         barkFormationHours: 2.8,
                         wrapDecisionTempC: 64,
                         wrapAccelerationFactor: 0.63,
-                        minTempC: 88,
-                        optimalTempC: 96,
+                        minTempC: 25,
+                        desiredRedTempC: 60,
                         holdingMin: 90,
-                        description: 'Pulled pork, stall extra largo para tierneza.'
+                        description: 'Pulled Pork: Rosa/rojo, jugoso. Stall extra largo para tierneza óptima.'
                     },
                     costillar_cerdo: {
                         name: 'Costillar de Cerdo (Pork Ribs)',
@@ -2006,10 +2006,10 @@
                         barkFormationHours: 1.8,
                         wrapDecisionTempC: 62,
                         wrapAccelerationFactor: 0.68,
-                        minTempC: 88,
-                        optimalTempC: 93,
+                        minTempC: 25,
+                        desiredRedTempC: 62,
                         holdingMin: 15,
-                        description: 'Costillas, método 3-2-1.'
+                        description: 'Costillas: Rosa/blanda, cremosa. Método 3-2-1.'
                     },
                     pollo_entero: {
                         name: 'Pollo Entero (Whole Chicken)',
@@ -2020,10 +2020,10 @@
                         barkFormationHours: 1.0,
                         wrapDecisionTempC: 70,
                         wrapAccelerationFactor: 0.75,
-                        minTempC: 74,
-                        optimalTempC: 74,
+                        minTempC: 25,
+                        desiredRedTempC: 72,
                         holdingMin: 10,
-                        description: 'Pollo, cocción rápida, stall mínimo.'
+                        description: 'Pollo: Blanco/seguro (72°C mínimo). Cocción rápida, stall mínimo.'
                     },
                     pavo_entero: {
                         name: 'Pavo Entero (Whole Turkey)',
@@ -2034,10 +2034,10 @@
                         barkFormationHours: 2.0,
                         wrapDecisionTempC: 70,
                         wrapAccelerationFactor: 0.72,
-                        minTempC: 74,
-                        optimalTempC: 74,
+                        minTempC: 25,
+                        desiredRedTempC: 73,
                         holdingMin: 20,
-                        description: 'Pavo grande, cocción lenta pero sin stall extremo.'
+                        description: 'Pavo: Blanco/seguro (73°C mínimo). Cocción lenta pero sin stall extremo.'
                     }
                 };
             }
@@ -2150,8 +2150,8 @@
                         ? stallMinutes * formula.wrapAccelerationFactor
                         : stallMinutes;
 
-                    // FASE 3: PUSH (68°C → objetivo) - Rápido
-                    const pushTempDiff = formula.optimalTempC - 68;
+                    // FASE 3: RENDERIZACIÓN (68°C → objetivo rojo/jugoso) - Rápido
+                    const pushTempDiff = formula.desiredRedTempC - 68;
                     const pushMinutes = pushTempDiff / formula.pushUpRate;
 
                     // Total
@@ -2188,7 +2188,7 @@
                         },
                         {
                             at: totalMinutes,
-                            msg: `✅ LISTO @ ${formula.optimalTempC}°C - REPOSA ${formula.holdingMin} min a 70°C`,
+                            msg: `✅ RENDERIZACIÓN LISTA @ ${formula.desiredRedTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
                             phase: 'done'
                         }
                     ];
@@ -2210,15 +2210,15 @@
                             warning: true
                         },
                         {
-                            name: 'Push Final',
+                            name: 'Renderización',
                             duration: Math.round(pushMinutes),
-                            tempRange: [68, formula.optimalTempC],
+                            tempRange: [68, formula.desiredRedTempC],
                             percent: (pushMinutes / totalMinutes) * 100
                         }
                     ];
 
-                    // Generar progresión de temperatura
-                    const temperatureRange = this.generateTempRange(formula.minTempC, formula.optimalTempC, 8);
+                    // Generar progresión de temperatura (25°C → temp rojo/jugosa)
+                    const temperatureRange = this.generateTempRange(25, formula.desiredRedTempC, 8);
 
                     // Resultado final
                     const result = {
@@ -2232,10 +2232,10 @@
                         estimatedCookingHours: hours,
                         estimatedCookingMinutes: minutes,
                         totalMinutes: totalMinutes,
-                        minTempC: formula.minTempC,
-                        minTempF: this.celsiusToFahrenheit(formula.minTempC),
-                        optimalTempC: formula.optimalTempC,
-                        optimalTempF: this.celsiusToFahrenheit(formula.optimalTempC),
+                        minTempC: 25,
+                        minTempF: this.celsiusToFahrenheit(25),
+                        desiredRedTempC: formula.desiredRedTempC,
+                        desiredRedTempF: this.celsiusToFahrenheit(formula.desiredRedTempC),
                         holdingMin: formula.holdingMin,
                         temperatureRange: temperatureRange,
                         // NUEVO: Datos de fases y eventos
@@ -3060,9 +3060,9 @@
                 <!-- Quick Info: 2-column grid -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 15px 0;">
                     <div class="card" style="padding: 15px;">
-                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🌡️ Temp. Objetivo</h4>
-                        <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.optimalTempC}°C</p>
-                        <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.optimalTempF}°F)</p>
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🔴 Temp. Rojo/Jugoso</h4>
+                        <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.desiredRedTempC}°C</p>
+                        <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.desiredRedTempF}°F) Carne rosada/roja</p>
                     </div>
                     <div class="card" style="padding: 15px;">
                         <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">⏸️ Reposo</h4>
@@ -3088,8 +3088,8 @@
                     <h3>Progresión de Temperatura Interna</h3>
                     <div class="bars">
                         ${result.temperatureRange.map(item => {
-                            const percentage = ((item.tempC - result.minTempC) / Math.max(1, (result.optimalTempC - result.minTempC))) * 100;
-                            const color = calculator.getColorForTemp(item.tempC, result.optimalTempC, result.minTempC);
+                            const percentage = ((item.tempC - 25) / Math.max(1, (result.desiredRedTempC - 25))) * 100;
+                            const color = calculator.getColorForTemp(item.tempC, result.desiredRedTempC, 25);
                             const tempF = calculator.celsiusToFahrenheit(item.tempC);
                             return `
                                 <div class="bar-item">
@@ -3112,12 +3112,12 @@
                 <div class="tips-section">
                     <h3>💡 Consejos para el Éxito</h3>
                     <ul>
-                        <li><strong>Bark (0-45 min):</strong> Mantén la tapa cerrada. No mires cada 5 min. 🌳</li>
-                        <li><strong>Stall (45 min - muchas horas):</strong> Temperatura sube lentamente. NORMAL. ${result.wrapped ? '✅ Va envuelto, seguirá acelerando.' : '⚠️ Considera envolver @ 63°C para acelerar 35%.'}</li>
-                        <li><strong>Push Final:</strong> Recta hacia la terneza. El esfuerzo valió la pena. 🚀</li>
-                        <li>Usa SIEMPRE termómetro de carne confiable (no confíes solo en tiempo).</li>
-                        <li>Mantén la temperatura del ahumador ±5°C consistente.</li>
-                        <li>Reposa en caja aislante con toalla. Los jugos se redistribuyen = más jugosa.</li>
+                        <li><strong>🌳 Bark (0-45 min):</strong> Cáscara crujiente. Mantén tapa cerrada, no espíes.</li>
+                        <li><strong>⏱️ Stall (horas):</strong> Temperatura sube lentamente. Normal y esperado. ${result.wrapped ? '✅ Va envuelto, acelera 35%.' : '⚠️ Considera envolver @ 63°C para acelerar.'}</li>
+                        <li><strong>🔴 Renderización (final):</strong> Corteza lista, carne rojo/jugosa @ ${result.desiredRedTempC}°C. ¡RETIRA AQUÍ! No continúes - la carne se grisará.</li>
+                        <li>🌡️ Usa SIEMPRE termómetro de carne confiable (no solo tiempo).</li>
+                        <li>❄️ Mantén ahumador ±5°C consistente.</li>
+                        <li>📦 Reposa en caja aislante. Los jugos se redistribuyen = más jugosa y tierna.</li>
                     </ul>
                 </div>
 
