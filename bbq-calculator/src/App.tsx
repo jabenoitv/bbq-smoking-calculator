@@ -1,4 +1,3 @@
-import React from 'react'
 import { BBQCalculator } from './components/BBQCalculator'
 import './App.css'
 

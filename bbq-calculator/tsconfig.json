@@ -17,7 +17,7 @@
     "noImplicitReturns": true,
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "jsx": "react-jsx"
   },
   "include": ["src"],
