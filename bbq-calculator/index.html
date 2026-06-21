@@ -1619,7 +1619,7 @@
                         <p>Selecciona el tipo de carne para obtener tiempos precisos</p>
                     </div>
                     <div class="form-group">
-                        <select id="meatType">
+                        <select id="meatType" onchange="wizardUI.updateMeatSelection()">
                             <optgroup label="🐄 Vacuno">
                                 <option value="tapapecho">Tapapecho (Brisket)</option>
                                 <option value="plateada">Plateada</option>
@@ -1679,6 +1679,43 @@
                             <button class="unit-toggle" onclick="calculator.toggleTempUnit(); wizardUI.updateDisplay()" id="tempUnitBtn">°C</button>
                         </div>
                     </div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="tempSlider" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>🔴 Temperatura Deseada (Rojo/Jugosa)</span>
+                            <span id="tempValue" style="font-weight: bold; color: var(--primary); font-size: 1.2em;">63°C</span>
+                        </label>
+                        <input id="tempSlider" type="range" min="55" max="80" value="63" step="1" style="width: 100%; height: 6px; border-radius: 3px; background: linear-gradient(to right, #6cba6c 0%, #ff7a3d 100%); outline: none; -webkit-appearance: none; cursor: pointer;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: var(--text-muted); margin-top: 8px;">
+                            <span id="tempMin">Rojo Frío (55°C)</span>
+                            <span id="tempMax">Gris (80°C)</span>
+                        </div>
+                    </div>
+
+                    <style>
+                        input[type="range"]::-webkit-slider-thumb {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 22px;
+                            height: 22px;
+                            border-radius: 50%;
+                            background: var(--primary);
+                            cursor: pointer;
+                            box-shadow: 0 2px 8px rgba(226, 88, 34, 0.4);
+                            border: 2px solid var(--accent);
+                        }
+
+                        input[type="range"]::-moz-range-thumb {
+                            width: 22px;
+                            height: 22px;
+                            border-radius: 50%;
+                            background: var(--primary);
+                            cursor: pointer;
+                            box-shadow: 0 2px 8px rgba(226, 88, 34, 0.4);
+                            border: 2px solid var(--accent);
+                        }
+                    </style>
+
                     <div class="wizard-nav">
                         <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
                         <button class="wizard-btn-next" onclick="wizardUI.nextStep()">Siguiente →</button>
@@ -1949,6 +1986,8 @@
                 return {
                     tapapecho: {
                         name: 'Tapapecho (Brisket)',
+                        tempRange: { min: 55, max: 80 },
+                        standardWeightKg: 4.5,
                         // Fase 1: Ramp-up (25→62°C)
                         rampUpRate: 0.35,  // °C/min
                         // Fase 2: Stall (62-68°C) - LA CLAVE
@@ -1968,6 +2007,8 @@
                     },
                     plateada: {
                         name: 'Plateada',
+                        tempRange: { min: 55, max: 80 },
+                        standardWeightKg: 4.0,
                         rampUpRate: 0.36,
                         stallBaseHours: 3.5,
                         stallRetardationFactor: 2.3,
@@ -1982,6 +2023,8 @@
                     },
                     punta_ganso: {
                         name: 'Punta de Ganso (Picaña)',
+                        tempRange: { min: 50, max: 68 },
+                        standardWeightKg: 2.5,
                         rampUpRate: 0.40,
                         stallBaseHours: 1.5,  // Picaña tiene stall más corto (término medio)
                         stallRetardationFactor: 1.8,
@@ -1996,6 +2039,8 @@
                     },
                     asado_tira: {
                         name: 'Asado de Tira (Short Ribs)',
+                        tempRange: { min: 58, max: 82 },
+                        standardWeightKg: 3.5,
                         rampUpRate: 0.34,
                         stallBaseHours: 3.5,
                         stallRetardationFactor: 2.4,
@@ -2010,6 +2055,8 @@
                     },
                     paleta_cerdo: {
                         name: 'Paleta de Cerdo (Pork Shoulder)',
+                        tempRange: { min: 55, max: 75 },
+                        standardWeightKg: 5.0,
                         rampUpRate: 0.33,
                         stallBaseHours: 4.5,  // Pulled pork tarda más
                         stallRetardationFactor: 2.6,
@@ -2024,6 +2071,8 @@
                     },
                     costillar_cerdo: {
                         name: 'Costillar de Cerdo (Pork Ribs)',
+                        tempRange: { min: 60, max: 76 },
+                        standardWeightKg: 2.0,
                         rampUpRate: 0.38,
                         stallBaseHours: 2.5,  // 3-2-1 method: stall en la mitad
                         stallRetardationFactor: 2.0,
@@ -2038,6 +2087,8 @@
                     },
                     pollo_entero: {
                         name: 'Pollo Entero (Whole Chicken)',
+                        tempRange: { min: 72, max: 74 },
+                        standardWeightKg: 1.8,
                         rampUpRate: 0.45,  // Pollo cocina rápido
                         stallBaseHours: 1.0,  // Stall mínimo
                         stallRetardationFactor: 1.4,
@@ -2052,6 +2103,8 @@
                     },
                     pavo_entero: {
                         name: 'Pavo Entero (Whole Turkey)',
+                        tempRange: { min: 73, max: 75 },
+                        standardWeightKg: 3.5,
                         rampUpRate: 0.42,
                         stallBaseHours: 2.0,
                         stallRetardationFactor: 1.9,
@@ -2164,6 +2217,11 @@
                     const weightKg = this.weightUnit === 'kg' ? weight : this.lbsToKg(weight);
                     const smokingTempC = this.tempUnit === 'C' ? smokingTemp : this.fahrenheitToCelsius(smokingTemp);
 
+                    // Get desired red temp from slider if available, otherwise use formula default
+                    const tempSlider = document.getElementById('tempSlider');
+                    const desiredRedTempC = tempSlider ? parseFloat(tempSlider.value) : formula.desiredRedTempC;
+                    const userSelectedTemp = tempSlider && Math.abs(desiredRedTempC - formula.desiredRedTempC) > 0.5;
+
                     // ==================== MODELO COMPLETO DE TERNEZA ====================
                     // FASE 1: RAMP-UP (25°C → 62°C) - Rápido, bark se forma
                     const rampUpTempDiff = 62 - 25;
@@ -2176,7 +2234,7 @@
                         : stallMinutes;
 
                     // FASE 3: RENDERIZACIÓN (68°C → objetivo rojo/jugoso) - Rápido
-                    const pushTempDiff = formula.desiredRedTempC - 68;
+                    const pushTempDiff = desiredRedTempC - 68;
                     const pushMinutes = pushTempDiff / formula.pushUpRate;
 
                     // Total
@@ -2213,7 +2271,7 @@
                         },
                         {
                             at: totalMinutes,
-                            msg: `✅ RENDERIZACIÓN LISTA @ ${formula.desiredRedTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
+                            msg: `✅ RENDERIZACIÓN LISTA @ ${desiredRedTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
                             phase: 'done'
                         }
                     ];
@@ -2237,13 +2295,13 @@
                         {
                             name: 'Renderización',
                             duration: Math.round(pushMinutes),
-                            tempRange: [68, formula.desiredRedTempC],
+                            tempRange: [68, desiredRedTempC],
                             percent: (pushMinutes / totalMinutes) * 100
                         }
                     ];
 
                     // Generar progresión de temperatura (25°C → temp rojo/jugosa)
-                    const temperatureRange = this.generateTempRange(25, formula.desiredRedTempC, 8);
+                    const temperatureRange = this.generateTempRange(25, desiredRedTempC, 8);
 
                     // Resultado final
                     const result = {
@@ -2259,10 +2317,11 @@
                         totalMinutes: totalMinutes,
                         minTempC: 25,
                         minTempF: this.celsiusToFahrenheit(25),
-                        desiredRedTempC: formula.desiredRedTempC,
-                        desiredRedTempF: this.celsiusToFahrenheit(formula.desiredRedTempC),
+                        desiredRedTempC: desiredRedTempC,
+                        desiredRedTempF: this.celsiusToFahrenheit(desiredRedTempC),
                         holdingMin: formula.holdingMin,
                         temperatureRange: temperatureRange,
+                        userSelected: userSelectedTemp,
                         // NUEVO: Datos de fases y eventos
                         phases: phases,
                         events: events,
@@ -3481,6 +3540,15 @@
                     if (e.key === 'ArrowLeft') this.prevStep();
                 });
 
+                // Set up temperature slider
+                const tempSlider = document.getElementById('tempSlider');
+                if (tempSlider) {
+                    tempSlider.addEventListener('input', (e) => {
+                        const value = e.target.value;
+                        document.getElementById('tempValue').textContent = value + '°C';
+                    });
+                }
+
                 // Show onboarding on first visit
                 if (this.isFirstVisit) {
                     setTimeout(() => this.showOnboarding(), 500);
@@ -3665,6 +3733,46 @@
 
                 overlay.appendChild(popup);
                 document.body.appendChild(overlay);
+            }
+
+            updateMeatSelection() {
+                const meatType = document.getElementById('meatType').value;
+                const formula = calculator.getMeatFormulas()[meatType];
+
+                if (formula) {
+                    // Auto-fill weight
+                    if (formula.standardWeightKg) {
+                        const weightInput = document.getElementById('weight');
+                        if (weightInput) {
+                            weightInput.value = formula.standardWeightKg;
+                        }
+                    }
+
+                    // Update temperature slider min/max
+                    const tempRange = formula.tempRange;
+                    const tempSlider = document.getElementById('tempSlider');
+                    const tempValue = document.getElementById('tempValue');
+                    const tempMin = document.getElementById('tempMin');
+                    const tempMax = document.getElementById('tempMax');
+
+                    if (tempSlider && tempRange) {
+                        tempSlider.min = tempRange.min;
+                        tempSlider.max = tempRange.max;
+                        tempSlider.value = formula.desiredRedTempC || tempRange.min;
+
+                        if (tempValue) {
+                            tempValue.textContent = tempSlider.value + '°C';
+                        }
+
+                        // Update range labels
+                        if (tempMin) {
+                            tempMin.textContent = `Rojo Frío (${tempRange.min}°C)`;
+                        }
+                        if (tempMax) {
+                            tempMax.textContent = `Gris (${tempRange.max}°C)`;
+                        }
+                    }
+                }
             }
         }
 
