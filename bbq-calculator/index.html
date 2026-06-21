@@ -735,6 +735,24 @@
             margin-top: 15px;
         }
 
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .temp-badge {
+            font-size: 0.7em;
+            background: rgba(255, 122, 61, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+            display: inline-block;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
         .stage-item {
             display: flex;
             align-items: center;
@@ -1547,10 +1565,16 @@
             .result-cards { grid-template-columns: 1fr; }
 
             .bars {
-                height: 200px;
-                gap: 6px;
+                height: 180px;
+                gap: 4px;
+                padding: 10px;
             }
 
+            .bar-item {
+                min-width: 30px;
+            }
+
+            .results-grid { grid-template-columns: 1fr; }
             .stages { grid-template-columns: 1fr; }
             .time-display { font-size: 1.5em; }
             .holding-time .duration { font-size: 1.4em; }
@@ -3058,9 +3082,9 @@
                 </div>
 
                 <!-- Quick Info: 2-column grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 15px 0;">
+                <div class="results-grid">
                     <div class="card" style="padding: 15px;">
-                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🔴 Temp. Rojo/Jugoso</h4>
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0; display: flex; align-items: center; gap: 4px;">🔴 Temp. Rojo/Jugoso ${result.userSelected ? '<span class="temp-badge">personalizado</span>' : ''}</h4>
                         <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.desiredRedTempC}°C</p>
                         <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.desiredRedTempF}°F) Carne rosada/roja</p>
                     </div>
