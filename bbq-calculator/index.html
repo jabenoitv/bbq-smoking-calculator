@@ -90,6 +90,166 @@
             border: 1px solid var(--border);
         }
 
+        /* Wizard UI Styles */
+        .wizard-container {
+            position: relative;
+            margin-bottom: 30px;
+            background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .wizard-indicator {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            justify-content: center;
+            background: var(--surface-3);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .wizard-step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--border-strong);
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .wizard-step-indicator.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .wizard-step-indicator.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .wizard-step {
+            display: none;
+            padding: 30px 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .step-header h2 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .step-header p {
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        .wrap-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .wrap-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            background: var(--surface);
+            border: 2px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text);
+            font-size: 0.95em;
+            font-weight: 600;
+            min-height: 120px;
+            justify-content: center;
+        }
+
+        .wrap-option:hover {
+            border-color: var(--primary);
+            background: var(--surface-2);
+            transform: translateY(-2px);
+        }
+
+        .wrap-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .wrap-icon {
+            font-size: 2.5em;
+        }
+
+        .wizard-nav {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .wizard-btn-prev,
+        .wizard-btn-next {
+            flex: 1;
+            padding: 14px 20px;
+            background: var(--surface-3);
+            color: var(--text);
+            border: 1.5px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wizard-btn-next {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .wizard-btn-prev:hover {
+            background: var(--surface);
+            border-color: var(--text);
+        }
+
+        .wizard-btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(226, 88, 34, 0.3);
+        }
+
+        .wizard-btn-prev:active,
+        .wizard-btn-next:active {
+            transform: translateY(0);
+        }
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -1139,6 +1299,80 @@
                 grid-template-columns: 1fr;
             }
 
+            /* Wizard mobile styles */
+            .wizard-step {
+                padding: 20px 15px;
+            }
+
+            .step-header {
+                margin-bottom: 20px;
+            }
+
+            .step-header h2 {
+                font-size: 1.25em;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group select,
+            .form-group input,
+            input[type="number"],
+            input[type="text"],
+            select {
+                min-height: 48px;
+                padding: 12px 14px;
+            }
+
+            .weight-input-group,
+            .temp-input-group {
+                gap: 10px;
+            }
+
+            .unit-toggle {
+                min-height: 48px;
+                padding: 12px 14px;
+            }
+
+            .wizard-nav {
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .wizard-btn-prev,
+            .wizard-btn-next {
+                width: 100%;
+                min-height: 52px;
+                font-size: 1em;
+            }
+
+            .wizard-indicator {
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .wizard-step-indicator {
+                width: 40px;
+                height: 40px;
+                font-size: 0.85em;
+            }
+
+            .wrap-options {
+                grid-template-columns: 1fr;
+            }
+
+            .wrap-option {
+                min-height: 100px;
+                padding: 15px;
+            }
+
+            .calculate-btn {
+                min-height: 52px;
+                font-size: 1em;
+                padding: 14px 20px;
+            }
+
             .result-cards { grid-template-columns: 1fr; }
 
             .bars {
@@ -1166,59 +1400,114 @@
 
         <!-- TAB: AHUMADO -->
         <div class="tab-content active" id="tab-ahumado">
-            <div class="input-section">
-                <div class="form-group">
-                    <label for="meatType">Tipo de Carne</label>
-                    <select id="meatType">
-                        <optgroup label="🐄 Vacuno">
-                            <option value="tapapecho">Tapapecho (Brisket)</option>
-                            <option value="plateada">Plateada</option>
-                            <option value="punta_ganso">Punta de Ganso (Picaña)</option>
-                            <option value="asado_tira">Asado de Tira (Short Ribs)</option>
-                        </optgroup>
-                        <optgroup label="🐷 Cerdo">
-                            <option value="paleta_cerdo">Paleta de Cerdo (Pork Shoulder)</option>
-                            <option value="costillar_cerdo">Costillar de Cerdo (Pork Ribs)</option>
-                        </optgroup>
-                        <optgroup label="🐔 Ave">
-                            <option value="pollo_entero">Pollo Entero (Whole Chicken)</option>
-                            <option value="pavo_entero">Pavo Entero (Whole Turkey)</option>
-                        </optgroup>
-                    </select>
+            <!-- 4-Step Wizard UI -->
+            <div class="wizard-container" id="wizardContainer">
+                <!-- Hidden inputs for compatibility -->
+                <input type="checkbox" id="wrappedToggle" style="display: none;">
+
+                <!-- Step Indicators -->
+                <div class="wizard-indicator">
+                    <div class="wizard-step-indicator active" id="stepIndicator1" data-step="1">1</div>
+                    <div class="wizard-step-indicator" id="stepIndicator2" data-step="2">2</div>
+                    <div class="wizard-step-indicator" id="stepIndicator3" data-step="3">3</div>
+                    <div class="wizard-step-indicator" id="stepIndicator4" data-step="4">4</div>
                 </div>
 
-                <div class="form-group">
-                    <label for="weight">Peso</label>
-                    <div class="weight-input-group">
-                        <input id="weight" type="number" value="3.0" min="0.1" step="0.1">
-                        <button class="unit-toggle" onclick="calculator.toggleWeightUnit()" id="weightUnitBtn">kg</button>
+                <!-- Step 1: Meat Type -->
+                <div class="wizard-step active" data-step="1" id="step1">
+                    <div class="step-header">
+                        <h2>¿Qué carne vas a ahumar?</h2>
+                        <p>Selecciona el tipo de carne para obtener tiempos precisos</p>
+                    </div>
+                    <div class="form-group">
+                        <select id="meatType">
+                            <optgroup label="🐄 Vacuno">
+                                <option value="tapapecho">Tapapecho (Brisket)</option>
+                                <option value="plateada">Plateada</option>
+                                <option value="punta_ganso">Punta de Ganso (Picaña)</option>
+                                <option value="asado_tira">Asado de Tira (Short Ribs)</option>
+                            </optgroup>
+                            <optgroup label="🐷 Cerdo">
+                                <option value="paleta_cerdo">Paleta de Cerdo (Pork Shoulder)</option>
+                                <option value="costillar_cerdo">Costillar de Cerdo (Pork Ribs)</option>
+                            </optgroup>
+                            <optgroup label="🐔 Ave">
+                                <option value="pollo_entero">Pollo Entero (Whole Chicken)</option>
+                                <option value="pavo_entero">Pavo Entero (Whole Turkey)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="wizard-nav">
+                        <button class="wizard-btn-next" onclick="wizardUI.nextStep()">Siguiente →</button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="smokingTemp">Temperatura del Ahumador</label>
-                    <div class="temp-input-group">
-                        <input id="smokingTemp" type="number" value="110" min="65" max="180" step="1">
-                        <button class="unit-toggle" onclick="calculator.toggleTempUnit()" id="tempUnitBtn">°C</button>
+                <!-- Step 2: Weight -->
+                <div class="wizard-step" data-step="2" id="step2">
+                    <div class="step-header">
+                        <h2>¿Cuánto pesa la carne?</h2>
+                        <p>Ingresa el peso para cálculos precisos</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Peso</label>
+                        <div class="weight-input-group">
+                            <input id="weight" type="number" value="3.0" min="0.1" step="0.1">
+                            <button class="unit-toggle" onclick="calculator.toggleWeightUnit(); wizardUI.updateDisplay()" id="weightUnitBtn">kg</button>
+                        </div>
+                    </div>
+                    <div class="wizard-nav">
+                        <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
+                        <button class="wizard-btn-next" onclick="wizardUI.nextStep()">Siguiente →</button>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>
-                        <input type="checkbox" id="wrappedToggle" onchange="calculator.calculate()">
-                        🔒 <strong>Envuelto</strong> (acelera stall 35%)
-                    </label>
-                    <small style="display: block; margin-top: 5px; color: var(--text-muted);">
-                        Recomienda envolver @ 63°C aprox. para reducir tiempo de stall
-                    </small>
+                <!-- Step 3: Temperature -->
+                <div class="wizard-step" data-step="3" id="step3">
+                    <div class="step-header">
+                        <h2>¿A qué temperatura?</h2>
+                        <p>Temperatura del ahumador durante la cocción</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="smokingTemp">Temperatura del Ahumador</label>
+                        <div class="temp-input-group">
+                            <input id="smokingTemp" type="number" value="110" min="65" max="180" step="1">
+                            <button class="unit-toggle" onclick="calculator.toggleTempUnit(); wizardUI.updateDisplay()" id="tempUnitBtn">°C</button>
+                        </div>
+                    </div>
+                    <div class="wizard-nav">
+                        <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
+                        <button class="wizard-btn-next" onclick="wizardUI.nextStep()">Siguiente →</button>
+                    </div>
                 </div>
 
-                <div class="button-group">
-                    <button class="calculate-btn" onclick="calculator.calculate()">Calcular</button>
-                    <button class="secondary-btn" onclick="stateManager.showHistory()">📋 Historial</button>
-                    <button class="secondary-btn" onclick="stateManager.exportData()">📥 Exportar</button>
-                    <button class="secondary-btn" onclick="stateManager.importData()">📤 Importar</button>
+                <!-- Step 4: Wrap & Calculate -->
+                <div class="wizard-step" data-step="4" id="step4">
+                    <div class="step-header">
+                        <h2>¿Lo vas a envolver?</h2>
+                        <p>Envolver acelera el stall aproximadamente un 35%</p>
+                    </div>
+                    <div class="wrap-options">
+                        <button class="wrap-option" onclick="wizardUI.setWrap(false)" id="wrapNo">
+                            <span class="wrap-icon">❌</span>
+                            <span class="wrap-label">No, sin envolver</span>
+                        </button>
+                        <button class="wrap-option" onclick="wizardUI.setWrap(true)" id="wrapYes">
+                            <span class="wrap-icon">✅</span>
+                            <span class="wrap-label">Sí, envolveré</span>
+                        </button>
+                    </div>
+                    <div class="wizard-nav">
+                        <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
+                        <button class="calculate-btn" onclick="calculator.calculate(); wizardUI.resetWizard()">🔥 CALCULAR AHORA</button>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Quick Action Buttons (below wizard) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; padding: 0 20px;">
+                <button class="secondary-btn" onclick="stateManager.showHistory()">📋 Historial</button>
+                <button class="secondary-btn" onclick="stateManager.exportData()">📥 Exportar</button>
+                <button class="secondary-btn" onclick="stateManager.importData()">📤 Importar</button>
             </div>
 
             <div id="results" class="results-section"></div>
@@ -2954,12 +3243,95 @@
         }, 100);
 
         // ================================================================
+        // 6B. WIZARD UI CONTROLLER
+        // ================================================================
+        class WizardUI {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 4;
+                this.selectedWrap = false;
+            }
+
+            nextStep() {
+                if (this.currentStep < this.totalSteps) {
+                    this.goToStep(this.currentStep + 1);
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.goToStep(this.currentStep - 1);
+                }
+            }
+
+            goToStep(step) {
+                if (step < 1 || step > this.totalSteps) return;
+
+                // Hide all steps
+                document.querySelectorAll('.wizard-step').forEach(s => {
+                    s.classList.remove('active');
+                });
+
+                // Update indicators
+                document.querySelectorAll('.wizard-step-indicator').forEach((ind, idx) => {
+                    ind.classList.remove('active', 'completed');
+                    if (idx + 1 < step) {
+                        ind.classList.add('completed');
+                    } else if (idx + 1 === step) {
+                        ind.classList.add('active');
+                    }
+                });
+
+                // Show current step
+                document.getElementById(`step${step}`).classList.add('active');
+                this.currentStep = step;
+
+                // Scroll to wizard for mobile
+                if (window.innerWidth <= 768) {
+                    document.getElementById('wizardContainer').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+
+            setWrap(value) {
+                this.selectedWrap = value;
+
+                // Update button states
+                document.getElementById('wrapNo').classList.toggle('selected', !value);
+                document.getElementById('wrapYes').classList.toggle('selected', value);
+
+                // Update the hidden checkbox
+                document.getElementById('wrappedToggle').checked = value;
+            }
+
+            updateDisplay() {
+                // Updates displayed values when unit toggle happens
+                // This is called from unit toggle buttons
+            }
+
+            resetWizard() {
+                // Reset to step 1 after calculation
+                setTimeout(() => {
+                    this.goToStep(1);
+                    this.setWrap(false);
+                }, 500);
+            }
+
+            getWrapState() {
+                return this.selectedWrap;
+            }
+        }
+
+        // ================================================================
         // 7. INSTANCIAS GLOBALES
         // ================================================================
         const calculator = new BBQEngine();
         const validator = new BBQValidator();
         const stateManager = new StateManager();
         const cureCalc = new CureCalculator();
+        const wizardUI = new WizardUI();
 
         let lastResult = null;
 
