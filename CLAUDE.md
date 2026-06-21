@@ -28,6 +28,15 @@ npx tsc --noEmit    # Type check without emitting (strict mode enabled)
 
 ## Architecture
 
+### Paradigm: Renderization vs Temperature
+
+**Important:** This calculator uses a **RED/JUICY paradigm**, not traditional doneness levels.
+
+- **Old Model (Obsolete):** Cook until grey/overcooked (96°C for brisket)
+- **New Model (Active):** Renderize the crust while keeping meat red/juicy (55-70°C)
+
+The app targets the **Maillard reaction (crust)** at optimal low internal temps, not full meat doneness. Users choose how red they want their meat, and the calculator computes time to reach that renderization point—not time to cook through.
+
 ### Project Structure
 
 ```
@@ -49,29 +58,61 @@ bbq-calculator/
 
 ### Key Concepts
 
-**Calculation Engine (`bbqFormulas.ts`):**
-- `MEAT_FORMULAS`: Dictionary of meat types with cooking ratios (hours per pound/kg), internal temps, and holding durations
-- `calculateCookingTime()`: Main function that takes meat type, weight, unit, and smoking temp → returns `CookingResult` with estimated cooking time, internal temps, and temperature progression stages
+**Calculation Engine (index.html BBQEngine class):**
+- `getMeatFormulas()`: Dictionary of 8 meat types, each with:
+  - `desiredRedTempC`: Target red/juicy internal temp (55-70°C, except poultry 72-75°C)
+  - `tempRange`: {min, max} dynamic range per cut (e.g., Brisket 55-80°C, Picaña 50-68°C)
+  - `standardWeightKg`: Typical cut weight (auto-populated in UI)
+  - `rampUpRate`, `stallBaseHours`, `pushUpRate`: 3-phase cooking model params
+  - `holdingMin`: Resting time in minutes
+- `calculateCookingWithTenderness()`: Takes meat, weight, smoking temp, user-selected desired temp (optional) → returns `CookingResult`
+  - **Phase 1 (Ramp-up):** 25°C → 62°C (bark formation, ~37 min)
+  - **Phase 2 (Stall):** 62-68°C (tenderness plateau, ~1-4 hours depending on cut)
+  - **Phase 3 (Renderización):** 68°C → user's desired red temp (crust while keeping meat red)
 - `celsiusToFahrenheit()` / `fahrenheitToCelsius()`: Unit conversion helpers
-- Temperature progression: Divides the range from min to optimal internal temp into stages ("Cociendo" → "Cocimiento avanzado" → "Casi listo" → "Listo")
+- Temperature progression: Divides 25°C → desired temp into 8 visual stages for charts
 
-**UI Component (`BBQCalculator.tsx`):**
-- State: meatType, weight, isKg (unit toggle), tempUnit, smokingTemp
-- User selects meat, enters weight/temp, clicks "Calcular"
-- On calculate: converts units if needed, calls `calculateCookingTime()`, displays results
-- Results show: estimated cooking time (hours/minutes), internal temp ranges, holding time recommendations
+**UI Component (Wizard 4-Step):**
+- **Step 1:** Select meat type → auto-updates temp range slider + weight
+- **Step 2:** Enter weight (kg/lbs toggle)
+- **Step 3:** Set smoking temperature + **[NEW] choose desired red level** (55-70°C slider, dynamic range per cut)
+- **Step 4:** Wrap? (Yes/No) → Calculate
+- **Results:** Shows time to renderization, target red temp, 3 phases, timeline, tips
+
+**Dynamic Temperature Selector (Phase 4):**
+- Slider min/max update based on selected meat type
+- Poultry (Chicken/Turkey) locked at 72-74°C and 73-75°C (food-safety guardrails)
+- Beef/Pork allow full range (50-82°C spectrum across all cuts)
+- User selection stored as `calculator.userDesiredRedTemp`
+- Calculation uses `userDesiredRedTemp` if set, else `formula.desiredRedTempC`
 
 **Styling:**
-- CSS modules (`.css` files imported as scoped styles)
-- Dark theme with gradients
-- Responsive design (works on mobile and desktop)
+- CSS in index.html (inline styles)
+- Dark theme: --primary #e25822 (burnt orange), --text #f5ebe0
+- Responsive: Mobile-first, 48px+ touch targets
+- Gradient sliders, collapsible sections, progress indicators
 
 ### Data Flow
 
-1. User inputs meat type, weight, temp → state updates
-2. Click "Calcular" → `handleCalculate()`
-3. Convert units to standard (°F, lbs) → call `calculateCookingTime()`
-4. Receive `CookingResult` → set state → re-render results section
+1. **User selects meat** → `updateTempSelector()` fires
+   - Slider min/max set to cut's range (e.g., 55-80 for brisket)
+   - Weight input pre-filled (e.g., 4.5kg for brisket)
+   - Temperature state label ("Rojo Frío/Medio/Cálido") updates
+2. **User adjusts temp slider** (optional) → `userDesiredRedTemp` stored
+3. **Click "Calcular"** → `calculateCookingWithTenderness()` called with:
+   - meatType, weight, smokingTemp
+   - userDesiredRedTemp (if user customized)
+4. **Calculation:**
+   - Phase 1: Ramp-up time to 62°C
+   - Phase 2: Stall duration (based on cut, weight, smoking temp)
+   - Phase 3: Push time to desired red temp (not grey!)
+   - Total = Phase 1 + Phase 2 + Phase 3
+5. **Results display:**
+   - Shows target red temp with "🔴 Temp. Rojo/Jugoso" label
+   - "personalizado" badge if user customized temp
+   - Graph scales 0-100% from 25°C → desired temp (not 96°C!)
+   - Timeline with Bark → Stall → Renderización phases
+   - Tips emphasize stopping at red, not overcooking
 
 ## Build & Deployment
 
@@ -105,9 +146,46 @@ No test suite currently configured. To add tests:
 - Create `.test.tsx` files alongside components
 - Run: `npm run test`
 
-## Notes for Future Work
+## Notes & Implementation Status
 
-- **Curing features:** Recent commits added curing calculators (Pastrami, Corned Beef, Bacon) in separate components — integrate with main calculator if needed
-- **UI improvements:** Recent refactor added dark theme, tabs, and curing tracker — ensure consistency when adding features
-- **Temperature adjustment formula:** Currently uses `(smokingTempF - 225) / 25` ratio — may need refinement based on user feedback
-- **Offline support:** App uses browser storage (localStorage) for persistence
+### ✅ Completed Features (Phases 1-4)
+
+**Phase 1: Data Layer (Paradigm Shift)**
+- ✅ Replaced `optimalTempC` (96°C grey) with `desiredRedTempC` (55-70°C red)
+- ✅ All 8 meats have red/juicy target temps
+- ✅ Poultry locked at food-safe temps (72-75°C)
+
+**Phase 2: Calculation Engine**
+- ✅ `calculateCookingWithTenderness()` targets red temps
+- ✅ Phase 3 renamed "Renderización" (crust while keeping meat red)
+- ✅ Time calculation is now to renderization point, not grey doneness
+- ✅ Example: Brisket 3kg @ 110°C = 5.5h to red (was 18-20h to grey)
+
+**Phase 3: Display & UI**
+- ✅ "🔴 Temp. Rojo/Jugoso" card replaces "Temp. Objetivo"
+- ✅ **Fixed inverted graph scales** (now 25°C → 63°C, not 25°C → 96°C)
+- ✅ Tips section emphasizes renderization ("¡RETIRA AQUÍ!")
+- ✅ Dynamic graph endpoints based on desired temp
+
+**Phase 4: Optional Temperature Selector**
+- ✅ Dynamic slider per cut (50-82°C spectrum)
+- ✅ Standard weights auto-populated per meat type
+- ✅ Poultry locked with food-safety warnings
+- ✅ Real-time calculation updates as user adjusts
+- ✅ "personalizado" badge when user customizes temp
+
+### 📋 Future Enhancements
+
+- [ ] **Temperature memory:** Save user's preferred temps per cut to localStorage
+- [ ] **Multiple smoker presets:** Store user's favorite smoker temps/wrapping combos
+- [ ] **Advanced stall detection:** Predict stall onset and suggest wrapping at optimal time
+- [ ] **Mobile app version:** React Native for iOS/Android with offline support
+- [ ] **Real-time thermometer sync:** Bluetooth integration with meat thermometers
+- [ ] **Historical cooking data:** Track past cooks, compare actuals vs estimates
+- [ ] **Recipe sharing:** Export/import cooking profiles as JSON/QR codes
+- [ ] **Internationalization:** Spanish, Portuguese, French, German support
+- [ ] **Curing calculator enhancements:** Expand from Bacon/Pastrami to 10+ brines
+
+### 🐛 Known Issues / Limitations
+
+- None currently. All core features stable.
