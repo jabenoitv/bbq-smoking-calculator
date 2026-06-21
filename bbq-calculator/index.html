@@ -1667,7 +1667,7 @@
                         <div style="display: flex; align-items: center; gap: 15px;">
                             <input type="range" id="desiredTempSlider" min="55" max="70" value="63" step="1"
                                    style="flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(to right, #ff6b6b, #ff9999, #ffcccc); outline: none; -webkit-appearance: slider-thumb;">
-                            <div style="display: flex; align-items: baseline; gap: 8px; min-width: 100px;">
+                            <div style="display: flex; align-items: baseline; gap: 8px; min-width: 130px;">
                                 <span id="desiredTempDisplay" style="font-size: 1.3em; font-weight: 700; color: #ff7a3d; min-width: 45px;">63°C</span>
                                 <span style="font-size: 0.75em; color: var(--text-dim);">
                                     <span id="desiredTempState">Rojo (típico)</span>
@@ -1675,9 +1675,9 @@
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; font-size: 0.75em; color: var(--text-dim);">
-                            <div style="text-align: left;">Frío (55°C)</div>
-                            <div style="text-align: center;">Medio (60-65°C)</div>
-                            <div style="text-align: right;">Cálido (70°C)</div>
+                            <div style="text-align: left;" class="temp-range-label">55°C</div>
+                            <div style="text-align: center;" class="temp-range-label">62°C</div>
+                            <div style="text-align: right;" class="temp-range-label">70°C</div>
                         </div>
                         <div id="poultryLockMessage" style="display: none; margin-top: 12px; padding: 10px; background: rgba(108, 186, 108, 0.15); border-left: 3px solid #6cba6c; border-radius: 4px; font-size: 0.8em; color: #6cba6c;">
                             🔒 Aves (pollo/pavo): Bloqueado en 72-73°C (seguridad alimentaria)
@@ -1955,20 +1955,17 @@
                 return {
                     tapapecho: {
                         name: 'Tapapecho (Brisket)',
-                        // Fase 1: Ramp-up (25→62°C)
-                        rampUpRate: 0.35,  // °C/min
-                        // Fase 2: Stall (62-68°C) - LA CLAVE
-                        stallBaseHours: 4.0,  // Brisket 1kg @ 107°C tarda ~4h en stall
-                        stallRetardationFactor: 2.5,  // stall tarda 2.5x que ramp-up
-                        // Fase 3: Renderización (68→63°C, carne roja y jugosa)
-                        pushUpRate: 0.25,  // °C/min
-                        // Bark & Wrap
+                        rampUpRate: 0.35,
+                        stallBaseHours: 4.0,
+                        stallRetardationFactor: 2.5,
+                        pushUpRate: 0.25,
                         barkFormationHours: 2.5,
                         wrapDecisionTempC: 63,
-                        wrapAccelerationFactor: 0.65,  // envuelto: 35% menos tiempo
-                        // Temperaturas
+                        wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 63,
+                        tempRange: { min: 55, max: 80 }, // Rojo frío a gris claro
+                        standardWeightKg: 4.5, // Típico: 4-5kg
                         holdingMin: 60,
                         description: 'Brisket chileno. Corteza gruesa, interior rojo y jugoso.'
                     },
@@ -1983,13 +1980,15 @@
                         wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 63,
+                        tempRange: { min: 55, max: 78 },
+                        standardWeightKg: 4.0,
                         holdingMin: 45,
                         description: 'Plateada: Corteza gruesa, interior rojo y jugoso. Stall ligeramente más corto.'
                     },
                     punta_ganso: {
                         name: 'Punta de Ganso (Picaña)',
                         rampUpRate: 0.40,
-                        stallBaseHours: 1.5,  // Picaña tiene stall más corto (término medio)
+                        stallBaseHours: 1.5,
                         stallRetardationFactor: 1.8,
                         pushUpRate: 0.30,
                         barkFormationHours: 1.5,
@@ -1997,6 +1996,8 @@
                         wrapAccelerationFactor: 0.70,
                         minTempC: 25,
                         desiredRedTempC: 62,
+                        tempRange: { min: 50, max: 68 }, // Raro a término medio
+                        standardWeightKg: 2.5,
                         holdingMin: 15,
                         description: 'Picaña: Término medio-raro, corteza crujiente. Stall corto, NO fall-apart.'
                     },
@@ -2011,13 +2012,15 @@
                         wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 65,
+                        tempRange: { min: 58, max: 82 },
+                        standardWeightKg: 3.0,
                         holdingMin: 30,
                         description: 'Short Ribs: Corteza gruesa, interior rojo y tierno. Cocción larga similar a brisket.'
                     },
                     paleta_cerdo: {
                         name: 'Paleta de Cerdo (Pork Shoulder)',
                         rampUpRate: 0.33,
-                        stallBaseHours: 4.5,  // Pulled pork tarda más
+                        stallBaseHours: 4.5,
                         stallRetardationFactor: 2.6,
                         pushUpRate: 0.23,
                         barkFormationHours: 2.8,
@@ -2025,13 +2028,15 @@
                         wrapAccelerationFactor: 0.63,
                         minTempC: 25,
                         desiredRedTempC: 60,
+                        tempRange: { min: 55, max: 75 },
+                        standardWeightKg: 5.0,
                         holdingMin: 90,
                         description: 'Pulled Pork: Rosa/rojo, jugoso. Stall extra largo para tierneza óptima.'
                     },
                     costillar_cerdo: {
                         name: 'Costillar de Cerdo (Pork Ribs)',
                         rampUpRate: 0.38,
-                        stallBaseHours: 2.5,  // 3-2-1 method: stall en la mitad
+                        stallBaseHours: 2.5,
                         stallRetardationFactor: 2.0,
                         pushUpRate: 0.28,
                         barkFormationHours: 1.8,
@@ -2039,13 +2044,15 @@
                         wrapAccelerationFactor: 0.68,
                         minTempC: 25,
                         desiredRedTempC: 62,
+                        tempRange: { min: 60, max: 76 },
+                        standardWeightKg: 2.0,
                         holdingMin: 15,
                         description: 'Costillas: Rosa/blanda, cremosa. Método 3-2-1.'
                     },
                     pollo_entero: {
                         name: 'Pollo Entero (Whole Chicken)',
-                        rampUpRate: 0.45,  // Pollo cocina rápido
-                        stallBaseHours: 1.0,  // Stall mínimo
+                        rampUpRate: 0.45,
+                        stallBaseHours: 1.0,
                         stallRetardationFactor: 1.4,
                         pushUpRate: 0.35,
                         barkFormationHours: 1.0,
@@ -2053,6 +2060,8 @@
                         wrapAccelerationFactor: 0.75,
                         minTempC: 25,
                         desiredRedTempC: 72,
+                        tempRange: { min: 72, max: 74 }, // Bloqueado por seguridad alimentaria
+                        standardWeightKg: 1.8,
                         holdingMin: 10,
                         description: 'Pollo: Blanco/seguro (72°C mínimo). Cocción rápida, stall mínimo.'
                     },
@@ -2067,6 +2076,8 @@
                         wrapAccelerationFactor: 0.72,
                         minTempC: 25,
                         desiredRedTempC: 73,
+                        tempRange: { min: 73, max: 75 }, // Bloqueado por seguridad alimentaria
+                        standardWeightKg: 5.5,
                         holdingMin: 20,
                         description: 'Pavo: Blanco/seguro (73°C mínimo). Cocción lenta pero sin stall extremo.'
                     }
@@ -3500,11 +3511,10 @@
                         // Update display
                         document.getElementById('desiredTempDisplay').textContent = temp + '°C';
 
-                        // Update state label
-                        let state = 'Rojo (típico)';
-                        if (temp <= 57) state = 'Rojo Frío';
-                        else if (temp >= 68) state = 'Rojo Cálido';
-                        document.getElementById('desiredTempState').textContent = state;
+                        // Update state label dynamically based on range
+                        const min = parseInt(e.target.min);
+                        const max = parseInt(e.target.max);
+                        wizardUI.updateTempState(temp, min, max);
                     });
                 }
 
@@ -3589,33 +3599,66 @@
             }
 
             updateTempSelector() {
-                // Show/hide temperature selector based on meat type
+                // Update temperature selector based on meat type
                 const meatType = document.getElementById('meatType').value;
-                const isPoultry = meatType === 'pollo_entero' || meatType === 'pavo_entero';
+                const formulas = calculator.getMeatFormulas();
+                const formula = formulas[meatType];
 
-                const section = document.getElementById('desiredTempSection');
+                if (!formula) return;
+
                 const slider = document.getElementById('desiredTempSlider');
                 const lockMessage = document.getElementById('poultryLockMessage');
+                const minRange = formula.tempRange.min;
+                const maxRange = formula.tempRange.max;
+                const defaultTemp = formula.desiredRedTempC;
 
-                if (isPoultry) {
-                    // Hide slider for poultry, show lock message
-                    slider.style.display = 'none';
-                    document.querySelector('[id="desiredTempState"]').parentElement.style.display = 'none';
-                    lockMessage.style.display = 'block';
-                    calculator.userDesiredRedTemp = null; // Reset
-                } else {
-                    // Show slider for beef/pork
-                    slider.style.display = 'block';
-                    document.querySelector('[id="desiredTempState"]').parentElement.style.display = 'inline';
-                    lockMessage.style.display = 'none';
+                // Update slider min/max dynamically
+                slider.min = minRange;
+                slider.max = maxRange;
+                slider.value = defaultTemp;
 
-                    // Reset to default based on meat type
-                    const formulas = calculator.getMeatFormulas();
-                    const defaultTemp = formulas[meatType]?.desiredRedTempC || 63;
-                    slider.value = defaultTemp;
-                    document.getElementById('desiredTempDisplay').textContent = defaultTemp + '°C';
-                    calculator.userDesiredRedTemp = null; // Reset (user hasn't adjusted yet)
+                // Update display
+                document.getElementById('desiredTempDisplay').textContent = defaultTemp + '°C';
+                this.updateTempState(defaultTemp, minRange, maxRange);
+
+                // Update range labels
+                const labels = document.querySelectorAll('.temp-range-label');
+                if (labels.length >= 3) {
+                    labels[0].textContent = `${minRange}°C`;
+                    labels[1].textContent = `${Math.round((minRange + maxRange) / 2)}°C`;
+                    labels[2].textContent = `${maxRange}°C`;
                 }
+
+                // Show/hide lock message for poultry
+                const isPoultry = meatType === 'pollo_entero' || meatType === 'pavo_entero';
+                if (isPoultry) {
+                    lockMessage.style.display = 'block';
+                    lockMessage.textContent = `🔒 ${formula.name}: Bloqueado en ${minRange}-${maxRange}°C (seguridad alimentaria)`;
+                } else {
+                    lockMessage.style.display = 'none';
+                }
+
+                // Set default weight
+                const weightInput = document.getElementById('weight');
+                if (weightInput) {
+                    weightInput.value = formula.standardWeightKg.toFixed(1);
+                }
+
+                // Reset user selection
+                calculator.userDesiredRedTemp = null;
+            }
+
+            updateTempState(temp, min, max) {
+                const range = max - min;
+                const mid = min + range / 2;
+                const upper = min + range * 0.75;
+
+                let state = 'Rojo (típico)';
+                if (temp <= mid - 5) state = `Rojo Frío (${temp}°C)`;
+                else if (temp >= upper) state = `Rojo Cálido (${temp}°C)`;
+                else state = `Rojo Medio (${temp}°C)`;
+
+                document.getElementById('desiredTempState').textContent = state;
             }
 
             focusInputOnStep() {
