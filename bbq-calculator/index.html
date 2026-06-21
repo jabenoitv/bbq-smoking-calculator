@@ -205,6 +205,97 @@
             font-size: 2.5em;
         }
 
+        .help-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(226, 88, 34, 0.3);
+        }
+
+        .help-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 25px;
+            max-width: 400px;
+            margin: 15px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .help-popup h3 {
+            margin-bottom: 12px;
+            color: var(--accent);
+            font-size: 1.1em;
+        }
+
+        .help-popup p {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .help-popup .help-close {
+            display: block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .help-popup .help-close:hover {
+            filter: brightness(1.1);
+        }
+
+        .help-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+
         .wizard-nav {
             display: flex;
             gap: 12px;
@@ -1425,7 +1516,10 @@
                 <!-- Step 1: Meat Type -->
                 <div class="wizard-step active" data-step="1" id="step1">
                     <div class="step-header">
-                        <h2>¿Qué carne vas a ahumar?</h2>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <h2 style="margin: 0;">¿Qué carne vas a ahumar?</h2>
+                            <button class="help-btn" onclick="wizardUI.showStepHelp(1)" title="Ver ayuda">?</button>
+                        </div>
                         <p>Selecciona el tipo de carne para obtener tiempos precisos</p>
                     </div>
                     <div class="form-group">
@@ -1454,7 +1548,10 @@
                 <!-- Step 2: Weight -->
                 <div class="wizard-step" data-step="2" id="step2">
                     <div class="step-header">
-                        <h2>¿Cuánto pesa la carne?</h2>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <h2 style="margin: 0;">¿Cuánto pesa la carne?</h2>
+                            <button class="help-btn" onclick="wizardUI.showStepHelp(2)" title="Ver ayuda">?</button>
+                        </div>
                         <p>Ingresa el peso para cálculos precisos</p>
                     </div>
                     <div class="form-group">
@@ -1473,7 +1570,10 @@
                 <!-- Step 3: Temperature -->
                 <div class="wizard-step" data-step="3" id="step3">
                     <div class="step-header">
-                        <h2>¿A qué temperatura?</h2>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <h2 style="margin: 0;">¿A qué temperatura?</h2>
+                            <button class="help-btn" onclick="wizardUI.showStepHelp(3)" title="Ver ayuda">?</button>
+                        </div>
                         <p>Temperatura del ahumador durante la cocción</p>
                     </div>
                     <div class="form-group">
@@ -1492,7 +1592,10 @@
                 <!-- Step 4: Wrap & Calculate -->
                 <div class="wizard-step" data-step="4" id="step4">
                     <div class="step-header">
-                        <h2>¿Lo vas a envolver?</h2>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <h2 style="margin: 0;">¿Lo vas a envolver?</h2>
+                            <button class="help-btn" onclick="wizardUI.showStepHelp(4)" title="Ver ayuda">?</button>
+                        </div>
                         <p>Envolver acelera el stall aproximadamente un 35%</p>
                     </div>
                     <div class="wrap-options">
@@ -3259,17 +3362,38 @@
                 this.currentStep = 1;
                 this.totalSteps = 4;
                 this.selectedWrap = false;
+                this.isFirstVisit = localStorage.getItem('bbq_wizard_first_visit') !== 'false';
+                this.init();
+            }
+
+            init() {
+                // Set up keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') this.nextStep();
+                    if (e.key === 'ArrowLeft') this.prevStep();
+                });
+
+                // Show onboarding on first visit
+                if (this.isFirstVisit) {
+                    setTimeout(() => this.showOnboarding(), 500);
+                    localStorage.setItem('bbq_wizard_first_visit', 'false');
+                }
+
+                // Set focus to first input on step change
+                this.goToStep(1);
             }
 
             nextStep() {
                 if (this.currentStep < this.totalSteps) {
                     this.goToStep(this.currentStep + 1);
+                    this.focusInputOnStep();
                 }
             }
 
             prevStep() {
                 if (this.currentStep > 1) {
                     this.goToStep(this.currentStep - 1);
+                    this.focusInputOnStep();
                 }
             }
 
@@ -3328,8 +3452,111 @@
                 }, 500);
             }
 
+            focusInputOnStep() {
+                const inputs = document.querySelectorAll(`#step${this.currentStep} input, #step${this.currentStep} select`);
+                if (inputs.length > 0) {
+                    inputs[0].focus();
+                }
+            }
+
+            showOnboarding() {
+                const overlay = document.createElement('div');
+                overlay.id = 'onboarding-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    animation: fadeIn 0.3s ease-out;
+                `;
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    background: var(--surface);
+                    border-radius: var(--radius);
+                    padding: 30px;
+                    max-width: 500px;
+                    margin: 20px;
+                    border: 1px solid var(--border);
+                    box-shadow: var(--shadow);
+                    text-align: center;
+                `;
+
+                modal.innerHTML = `
+                    <h2 style="color: var(--accent); margin-bottom: 15px; font-size: 1.5em;">👋 ¡Bienvenido!</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                        Esta calculadora te ayudará a determinar los tiempos precisos para ahumar tus carnes.
+                        Solo sigue 4 sencillos pasos y obtén tu receta personalizada.
+                    </p>
+                    <div style="background: var(--surface-2); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px; border-left: 4px solid var(--primary);">
+                        <p style="font-size: 0.9em; color: var(--text); margin: 0;">
+                            💡 <strong>Tip:</strong> Usa las flechas del teclado (← →) para navegar entre pasos
+                        </p>
+                    </div>
+                    <button onclick="document.getElementById('onboarding-overlay').remove()"
+                            style="background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: white; border: none; padding: 12px 30px; border-radius: var(--radius-sm); font-size: 1em; font-weight: 600; cursor: pointer; width: 100%; min-height: 48px;">
+                        ¡Empecemos!
+                    </button>
+                `;
+
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+            }
+
             getWrapState() {
                 return this.selectedWrap;
+            }
+
+            showStepHelp(step) {
+                const helpContent = {
+                    1: {
+                        title: 'Selección de Carne',
+                        text: 'Cada tipo de carne tiene un tiempo de cocción diferente. Las carnes más densas como el brisket tardan más. El calculador usa fórmulas basadas en BBQtrail para determinar tiempos precisos.'
+                    },
+                    2: {
+                        title: 'Peso de la Carne',
+                        text: 'Puedes usar kilogramos (kg) o libras (lbs). El peso es crucial para calcular el tiempo de cocción. Usa una balanza para obtener un resultado más preciso.'
+                    },
+                    3: {
+                        title: 'Temperatura del Ahumador',
+                        text: 'La temperatura afecta directamente el tiempo de cocción. Temperaturas más altas cocinan más rápido. El rango típico es 100-130°C (225-250°F). Mantén una temperatura consistente durante toda la cocción.'
+                    },
+                    4: {
+                        title: 'Envolver (Texas Crutch)',
+                        text: 'Envolver la carne en papel de aluminio alrededor de los 63°C reduce el tiempo de stall (meseta de cocción) hasta un 35%. Esto acelera el proceso pero puede afectar la formación de corteza.'
+                    }
+                };
+
+                const help = helpContent[step] || { title: 'Ayuda', text: 'No hay información disponible' };
+
+                // Remove existing overlay/popup
+                const existing = document.getElementById('help-overlay');
+                if (existing) existing.remove();
+
+                // Create overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'help-overlay';
+                overlay.className = 'help-overlay';
+                overlay.onclick = () => overlay.remove();
+
+                // Create popup
+                const popup = document.createElement('div');
+                popup.className = 'help-popup';
+                popup.onclick = (e) => e.stopPropagation();
+                popup.innerHTML = `
+                    <h3>💡 ${help.title}</h3>
+                    <p>${help.text}</p>
+                    <button class="help-close" onclick="document.getElementById('help-overlay').remove()">Cerrar</button>
+                `;
+
+                overlay.appendChild(popup);
+                document.body.appendChild(overlay);
             }
         }
 
