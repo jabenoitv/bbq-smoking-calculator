@@ -1,4 +1,4 @@
-import EventEmitter from './EventEmitter.js';
+import EventEmitter from '../../shared/EventEmitter.js';
 
 /**
  * BBQEngine - Motor de cálculo de cocción BBQ

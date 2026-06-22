@@ -4,7 +4,7 @@
  */
 
 import CookingCurveCalculator from './CookingCurveCalculator.js';
-import BBQEngine from './BBQEngine.js';
+import BBQEngine from '../core/BBQEngine.js';
 
 class TestRunner {
   constructor() {

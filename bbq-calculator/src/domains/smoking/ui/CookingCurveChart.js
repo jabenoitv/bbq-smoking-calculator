@@ -1,4 +1,4 @@
-import CookingCurveCalculator from '../core/CookingCurveCalculator.js';
+import CookingCurveCalculator from '../calculation/CookingCurveCalculator.js';
 
 /**
  * CookingCurveChart - Visualizador de curva de cocción
