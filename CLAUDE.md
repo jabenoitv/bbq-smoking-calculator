@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The main application is in the `bbq-calculator/` directory. It's a React 18 + TypeScript + Vite SPA for calculating BBQ smoking times.
 
+> **📍 Empieza por aquí si vas a editar:** lee primero estos dos documentos, que explican el estado real y dónde está cada cosa:
+> - `bbq-calculator/MAPA_CONCEPTUAL.md` — overview + diagramas (capas, flujo de datos, mapa de archivos, reglas para editar)
+> - `bbq-calculator/MODULAR_ARCHITECTURE.md` — referencia detallada módulo por módulo (13 módulos, 240 tests)
+>
+> **Importante:** existe un refactor modular completo (Fases 1-4) en `src/{core,viz,state,ui}/` con estrategia de "módulo congelado" (un módulo testeado no se vuelve a tocar; nueva funcionalidad = módulo nuevo). El `index.html` monolítico sigue en producción hasta que el orquestador `App.integrated.js` (M13) se cablee. No dupliques lógica que ya viva en un módulo Core.
+
 ### Common Commands
 
 **Development:**
