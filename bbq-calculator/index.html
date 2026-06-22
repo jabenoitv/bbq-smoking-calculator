@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔥 BBQ Smoking Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #1a1410;
@@ -684,68 +683,6 @@
             font-size: 1.1em;
         }
 
-        #cookingCurveChart {
-            max-width: 100%;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        .altitude-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background: rgba(108, 186, 108, 0.1);
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--success);
-        }
-
-        .altitude-info button {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .altitude-info button:hover {
-            opacity: 0.9;
-        }
-
-        .rendering-levels {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .rendering-btn {
-            padding: 12px 15px;
-            border: 2px solid var(--border);
-            background: transparent;
-            color: var(--text);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.2s ease;
-        }
-
-        .rendering-btn:hover {
-            border-color: var(--primary);
-            background: rgba(226, 88, 34, 0.1);
-        }
-
-        .rendering-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-2));
-            border-color: var(--accent);
-            color: white;
-        }
-
         .bars {
             display: flex;
             align-items: flex-end;
@@ -760,9 +697,8 @@
 
         .bar-item {
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
             align-items: center;
-            justify-content: flex-end;
             flex: 1;
             height: 100%;
         }
@@ -776,7 +712,7 @@
         }
 
         .temp-label {
-            margin-bottom: 8px;
+            margin-top: 8px;
             font-size: 0.75em;
             font-weight: 600;
             color: var(--text);
@@ -797,24 +733,6 @@
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
             margin-top: 15px;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin: 15px 0;
-        }
-
-        .temp-badge {
-            font-size: 0.7em;
-            background: rgba(255, 122, 61, 0.2);
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-left: 4px;
-            display: inline-block;
-            white-space: nowrap;
-            vertical-align: middle;
         }
 
         .stage-item {
@@ -1109,6 +1027,29 @@
 
         .cure-warnings li strong {
             color: var(--text);
+        }
+
+        /* Timer Styles */
+        .timer-deviation {
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .timer-deviation.good {
+            background: rgba(108, 186, 108, 0.3);
+            color: var(--success);
+        }
+
+        .timer-deviation.warning {
+            background: rgba(245, 184, 65, 0.3);
+            color: var(--accent);
+        }
+
+        .timer-deviation.alert {
+            background: rgba(192, 57, 43, 0.3);
+            color: #ff6b6b;
         }
 
         @media (max-width: 768px) {
@@ -1629,16 +1570,10 @@
             .result-cards { grid-template-columns: 1fr; }
 
             .bars {
-                height: 180px;
-                gap: 4px;
-                padding: 10px;
+                height: 200px;
+                gap: 6px;
             }
 
-            .bar-item {
-                min-width: 30px;
-            }
-
-            .results-grid { grid-template-columns: 1fr; }
             .stages { grid-template-columns: 1fr; }
             .time-display { font-size: 1.5em; }
             .holding-time .duration { font-size: 1.4em; }
@@ -1652,6 +1587,7 @@
 
         <nav class="tabs-nav">
             <button class="tab-btn active" data-tab="ahumado" onclick="switchTab('ahumado')">🔥 Ahumado</button>
+            <button class="tab-btn" data-tab="cronometro" onclick="switchTab('cronometro')">⏱️ Cronómetro</button>
             <button class="tab-btn" data-tab="curados" onclick="switchTab('curados')">🥓 Curados</button>
             <button class="tab-btn" data-tab="mis-curados" onclick="switchTab('mis-curados')">📅 Mis Curados <span id="activeCuresBadge" style="display:none; background:var(--primary); color:white; border-radius:10px; padding:2px 7px; font-size:0.7em; margin-left:4px; font-weight:700;"></span></button>
             <button class="tab-btn" data-tab="gadgets" onclick="switchTab('gadgets')">🔧 Gadgets</button>
@@ -1682,7 +1618,7 @@
                         <p>Selecciona el tipo de carne para obtener tiempos precisos</p>
                     </div>
                     <div class="form-group">
-                        <select id="meatType" onchange="wizardUI.updateMeatSelection()">
+                        <select id="meatType" onchange="wizardUI.updateTempSelector()">
                             <optgroup label="🐄 Vacuno">
                                 <option value="tapapecho">Tapapecho (Brisket)</option>
                                 <option value="plateada">Plateada</option>
@@ -1743,41 +1679,40 @@
                         </div>
                     </div>
 
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label for="tempSlider" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span>🔴 Temperatura Deseada (Rojo/Jugosa)</span>
-                            <span id="tempValue" style="font-weight: bold; color: var(--primary); font-size: 1.2em;">63°C</span>
+                    <!-- Rendering Level Selection: Raro/Rosa/Gris -->
+                    <div class="form-group" id="desiredTempSection" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
+                        <label style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            🔴 Nivel de Renderización
+                            <span style="font-size: 0.85em; color: var(--text-muted);">(Elige tu preferencia)</span>
                         </label>
-                        <input id="tempSlider" type="range" min="55" max="80" value="63" step="1" style="width: 100%; height: 6px; border-radius: 3px; background: linear-gradient(to right, #6cba6c 0%, #ff7a3d 100%); outline: none; -webkit-appearance: none; cursor: pointer;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: var(--text-muted); margin-top: 8px;">
-                            <span id="tempMin">Rojo Frío (55°C)</span>
-                            <span id="tempMax">Gris (80°C)</span>
+                        <p style="font-size: 0.85em; color: var(--text-muted); margin: 8px 0 12px 0;">
+                            Selecciona qué tan rojo/cocida deseas la carne
+                        </p>
+                        <div class="rendering-levels">
+                            <button class="rendering-btn" id="rarBtn" onclick="setRenderingLevel('raro')">
+                                🩸 Raro<span style="font-size: 0.75em; display: block; margin-top: 4px;">Muy rojo</span>
+                            </button>
+                            <button class="rendering-btn active" id="rosBtn" onclick="setRenderingLevel('rosa')">
+                                🔴 Rosa<span style="font-size: 0.75em; display: block; margin-top: 4px;">Rojo/Jugoso</span>
+                            </button>
+                            <button class="rendering-btn" id="grisBtn" onclick="setRenderingLevel('gris')">
+                                ⚫ Gris<span style="font-size: 0.75em; display: block; margin-top: 4px;">Más cocido</span>
+                            </button>
+                        </div>
+                        <div id="renderingLevelDisplay" style="margin-top: 12px; padding: 10px; background: rgba(226, 88, 34, 0.1); border-left: 3px solid #ff7a3d; border-radius: 4px; font-size: 0.85em; color: var(--text);">
+                            Temperatura: <span id="selectedRenderingTemp" style="font-weight: bold; color: #ff7a3d;">63°C</span>
+                        </div>
+                        <div id="poultryLockMessage" style="display: none; margin-top: 12px; padding: 10px; background: rgba(108, 186, 108, 0.15); border-left: 3px solid #6cba6c; border-radius: 4px; font-size: 0.8em; color: #6cba6c;">
+                            🔒 Aves (pollo/pavo): Bloqueado en 72-73°C (seguridad alimentaria)
                         </div>
                     </div>
 
-                    <style>
-                        input[type="range"]::-webkit-slider-thumb {
-                            -webkit-appearance: none;
-                            appearance: none;
-                            width: 22px;
-                            height: 22px;
-                            border-radius: 50%;
-                            background: var(--primary);
-                            cursor: pointer;
-                            box-shadow: 0 2px 8px rgba(226, 88, 34, 0.4);
-                            border: 2px solid var(--accent);
-                        }
-
-                        input[type="range"]::-moz-range-thumb {
-                            width: 22px;
-                            height: 22px;
-                            border-radius: 50%;
-                            background: var(--primary);
-                            cursor: pointer;
-                            box-shadow: 0 2px 8px rgba(226, 88, 34, 0.4);
-                            border: 2px solid var(--accent);
-                        }
-                    </style>
+                    <!-- GPS Altitude Detection -->
+                    <div class="altitude-info" style="margin-top: 20px;">
+                        <span>🏔️ Altitud detectada:</span>
+                        <span id="altitudeDisplay" style="font-weight: bold; color: var(--success);">Sea level</span>
+                        <button onclick="detectAltitude()" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: 600; margin-left: auto;">📍 Detectar</button>
+                    </div>
 
                     <div class="wizard-nav">
                         <button class="wizard-btn-prev" onclick="wizardUI.prevStep()">← Atrás</button>
@@ -1822,6 +1757,102 @@
             <div id="history" style="display:none; margin-bottom: 30px;">
                 <h3>Recetas Guardadas</h3>
                 <div class="history-list" id="historyList"></div>
+            </div>
+        </div>
+
+        <!-- TAB: CRONÓMETRO EN VIVO -->
+        <div class="tab-content" id="tab-cronometro">
+            <h2 style="margin-bottom:5px; color:var(--accent);">⏱️ Cronómetro en Vivo</h2>
+            <p style="color:var(--text-muted); margin-bottom:20px;">Rastrea tu sesión de cocción en tiempo real con gráfica de comparación.</p>
+
+            <!-- SECCIÓN 1: Seleccionar Receta Guardada -->
+            <div class="input-section" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="timerRecipeSelect">Seleccionar Receta Guardada</label>
+                    <select id="timerRecipeSelect">
+                        <option value="">-- Sin receta --</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 10px;">
+                    <button class="secondary-btn" onclick="timerManager.loadRecipe()" style="flex: 1;">📋 Cargar Receta</button>
+                    <button class="secondary-btn" onclick="timerManager.newSession()" style="flex: 1;">✨ Nueva Sesión</button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: Cronómetro y Controles -->
+            <div style="background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="timerDisplay" style="font-size: 4em; font-weight: 900; color: var(--primary); font-family: 'Courier New', monospace; letter-spacing: 3px; margin-bottom: 15px;">00:00:00</div>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="action-btn" id="timerStartBtn" onclick="timerManager.start()" style="min-width: 120px;">▶️ Iniciar</button>
+                        <button class="action-btn" id="timerPauseBtn" onclick="timerManager.pause()" style="min-width: 120px; display: none;">⏸️ Pausar</button>
+                        <button class="action-btn" id="timerStopBtn" onclick="timerManager.stop()" style="min-width: 120px; display: none;">⏹️ Detener</button>
+                    </div>
+                </div>
+
+                <!-- Mostrar receta esperada si está cargada -->
+                <div id="expectedCurveInfo" style="display: none; background: rgba(108, 186, 108, 0.15); padding: 15px; border-radius: var(--radius-sm); border-left: 3px solid var(--success); margin-top: 15px;">
+                    <p style="color: var(--text-muted); margin: 0;"><strong>Receta Esperada:</strong> <span id="expectedCurveName" style="color: var(--text);"></span></p>
+                    <p style="color: var(--text-muted); margin: 5px 0 0 0;"><strong>Tiempo Total:</strong> <span id="expectedCurveTime" style="color: var(--text);"></span></p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: Input en Vivo -->
+            <div style="background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px;">
+                <h3 style="color: var(--accent); margin-bottom: 15px;">📊 Agregar Medición en Vivo</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="timerTempInput">Temperatura Medida (°C)</label>
+                        <input id="timerTempInput" type="number" value="25" min="0" max="100" step="0.1" placeholder="Ej: 52.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="timerNoteInput">Nota (opcional)</label>
+                        <input id="timerNoteInput" type="text" placeholder="Ej: se pegó la carne">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="timerManager.addMeasurement()" style="width: 100%; margin-bottom: 15px;">➕ Agregar Medición</button>
+
+                <!-- Tabla de Log -->
+                <div id="timerLogTable" style="background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); overflow-x: auto; max-height: 300px; overflow-y: auto;">
+                    <table style="width: 100%; font-size: 0.9em; border-collapse: collapse;">
+                        <thead style="background: var(--surface-3); position: sticky; top: 0;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: var(--accent);">Tiempo</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: var(--accent);">Temp Real</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: var(--accent);">Esperada</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: var(--accent);">Desv.</th>
+                                <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--border); color: var(--accent);">Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timerLogTableBody">
+                            <tr>
+                                <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-dim);">Sin mediciones aún</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 4: Gráfica Comparativa -->
+            <div style="background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px;">
+                <h3 style="color: var(--accent); margin-bottom: 15px;">📈 Gráfica Comparativa (Esperada vs Real)</h3>
+                <div id="timerChartContainer" style="position: relative; height: 400px; width: 100%;">
+                    <canvas id="timerChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Acciones y Alertas -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                <button class="action-btn" onclick="timerManager.saveCookingSession()">💾 Guardar Sesión</button>
+                <button class="action-btn" onclick="timerManager.exportLog()">📥 Exportar CSV</button>
+                <button class="secondary-btn" onclick="timerManager.compareSessions()">📊 Comparar Sesiones</button>
+                <button class="secondary-btn" onclick="timerManager.reset()">🔄 Reiniciar</button>
+            </div>
+
+            <!-- Comparativa histórica (oculta hasta que usuario la abra) -->
+            <div id="compareSessionsContainer" style="display: none; margin-top: 20px; background: linear-gradient(180deg, var(--surface-2), var(--surface-3)); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border);">
+                <h3 style="color: var(--accent); margin-bottom: 15px;">📊 Comparativa de Sesiones Pasadas</h3>
+                <div id="historicalSessionsList" style="display: grid; gap: 15px;"></div>
             </div>
         </div>
 
@@ -2029,6 +2060,7 @@
                 super();
                 this.weightUnit = 'kg';
                 this.tempUnit = 'C';
+                this.userDesiredRedTemp = null; // User-selected red temp (55-70°C), null = use formula default
             }
 
             /**
@@ -2049,29 +2081,22 @@
                 return {
                     tapapecho: {
                         name: 'Tapapecho (Brisket)',
-                        tempRange: { min: 55, max: 80 },
-                        standardWeightKg: 4.5,
-                        // Fase 1: Ramp-up (25→62°C)
-                        rampUpRate: 0.35,  // °C/min
-                        // Fase 2: Stall (62-68°C) - LA CLAVE
-                        stallBaseHours: 4.0,  // Brisket 1kg @ 107°C tarda ~4h en stall
-                        stallRetardationFactor: 2.5,  // stall tarda 2.5x que ramp-up
-                        // Fase 3: Renderización (68→63°C, carne roja y jugosa)
-                        pushUpRate: 0.25,  // °C/min
-                        // Bark & Wrap
+                        rampUpRate: 0.35,
+                        stallBaseHours: 4.0,
+                        stallRetardationFactor: 2.5,
+                        pushUpRate: 0.25,
                         barkFormationHours: 2.5,
                         wrapDecisionTempC: 63,
-                        wrapAccelerationFactor: 0.65,  // envuelto: 35% menos tiempo
-                        // Temperaturas
+                        wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 63,
+                        tempRange: { min: 55, max: 80 }, // Rojo frío a gris claro
+                        standardWeightKg: 4.5, // Típico: 4-5kg
                         holdingMin: 60,
                         description: 'Brisket chileno. Corteza gruesa, interior rojo y jugoso.'
                     },
                     plateada: {
                         name: 'Plateada',
-                        tempRange: { min: 55, max: 80 },
-                        standardWeightKg: 4.0,
                         rampUpRate: 0.36,
                         stallBaseHours: 3.5,
                         stallRetardationFactor: 2.3,
@@ -2081,15 +2106,15 @@
                         wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 63,
+                        tempRange: { min: 55, max: 78 },
+                        standardWeightKg: 4.0,
                         holdingMin: 45,
                         description: 'Plateada: Corteza gruesa, interior rojo y jugoso. Stall ligeramente más corto.'
                     },
                     punta_ganso: {
                         name: 'Punta de Ganso (Picaña)',
-                        tempRange: { min: 50, max: 68 },
-                        standardWeightKg: 2.5,
                         rampUpRate: 0.40,
-                        stallBaseHours: 1.5,  // Picaña tiene stall más corto (término medio)
+                        stallBaseHours: 1.5,
                         stallRetardationFactor: 1.8,
                         pushUpRate: 0.30,
                         barkFormationHours: 1.5,
@@ -2097,13 +2122,13 @@
                         wrapAccelerationFactor: 0.70,
                         minTempC: 25,
                         desiredRedTempC: 62,
+                        tempRange: { min: 50, max: 68 }, // Raro a término medio
+                        standardWeightKg: 2.5,
                         holdingMin: 15,
                         description: 'Picaña: Término medio-raro, corteza crujiente. Stall corto, NO fall-apart.'
                     },
                     asado_tira: {
                         name: 'Asado de Tira (Short Ribs)',
-                        tempRange: { min: 58, max: 82 },
-                        standardWeightKg: 3.5,
                         rampUpRate: 0.34,
                         stallBaseHours: 3.5,
                         stallRetardationFactor: 2.4,
@@ -2113,15 +2138,15 @@
                         wrapAccelerationFactor: 0.65,
                         minTempC: 25,
                         desiredRedTempC: 65,
+                        tempRange: { min: 58, max: 82 },
+                        standardWeightKg: 3.0,
                         holdingMin: 30,
                         description: 'Short Ribs: Corteza gruesa, interior rojo y tierno. Cocción larga similar a brisket.'
                     },
                     paleta_cerdo: {
                         name: 'Paleta de Cerdo (Pork Shoulder)',
-                        tempRange: { min: 55, max: 75 },
-                        standardWeightKg: 5.0,
                         rampUpRate: 0.33,
-                        stallBaseHours: 4.5,  // Pulled pork tarda más
+                        stallBaseHours: 4.5,
                         stallRetardationFactor: 2.6,
                         pushUpRate: 0.23,
                         barkFormationHours: 2.8,
@@ -2129,15 +2154,15 @@
                         wrapAccelerationFactor: 0.63,
                         minTempC: 25,
                         desiredRedTempC: 60,
+                        tempRange: { min: 55, max: 75 },
+                        standardWeightKg: 5.0,
                         holdingMin: 90,
                         description: 'Pulled Pork: Rosa/rojo, jugoso. Stall extra largo para tierneza óptima.'
                     },
                     costillar_cerdo: {
                         name: 'Costillar de Cerdo (Pork Ribs)',
-                        tempRange: { min: 60, max: 76 },
-                        standardWeightKg: 2.0,
                         rampUpRate: 0.38,
-                        stallBaseHours: 2.5,  // 3-2-1 method: stall en la mitad
+                        stallBaseHours: 2.5,
                         stallRetardationFactor: 2.0,
                         pushUpRate: 0.28,
                         barkFormationHours: 1.8,
@@ -2145,15 +2170,15 @@
                         wrapAccelerationFactor: 0.68,
                         minTempC: 25,
                         desiredRedTempC: 62,
+                        tempRange: { min: 60, max: 76 },
+                        standardWeightKg: 2.0,
                         holdingMin: 15,
                         description: 'Costillas: Rosa/blanda, cremosa. Método 3-2-1.'
                     },
                     pollo_entero: {
                         name: 'Pollo Entero (Whole Chicken)',
-                        tempRange: { min: 72, max: 74 },
-                        standardWeightKg: 1.8,
-                        rampUpRate: 0.45,  // Pollo cocina rápido
-                        stallBaseHours: 1.0,  // Stall mínimo
+                        rampUpRate: 0.45,
+                        stallBaseHours: 1.0,
                         stallRetardationFactor: 1.4,
                         pushUpRate: 0.35,
                         barkFormationHours: 1.0,
@@ -2161,13 +2186,13 @@
                         wrapAccelerationFactor: 0.75,
                         minTempC: 25,
                         desiredRedTempC: 72,
+                        tempRange: { min: 72, max: 74 }, // Bloqueado por seguridad alimentaria
+                        standardWeightKg: 1.8,
                         holdingMin: 10,
                         description: 'Pollo: Blanco/seguro (72°C mínimo). Cocción rápida, stall mínimo.'
                     },
                     pavo_entero: {
                         name: 'Pavo Entero (Whole Turkey)',
-                        tempRange: { min: 73, max: 75 },
-                        standardWeightKg: 3.5,
                         rampUpRate: 0.42,
                         stallBaseHours: 2.0,
                         stallRetardationFactor: 1.9,
@@ -2177,6 +2202,8 @@
                         wrapAccelerationFactor: 0.72,
                         minTempC: 25,
                         desiredRedTempC: 73,
+                        tempRange: { min: 73, max: 75 }, // Bloqueado por seguridad alimentaria
+                        standardWeightKg: 5.5,
                         holdingMin: 20,
                         description: 'Pavo: Blanco/seguro (73°C mínimo). Cocción lenta pero sin stall extremo.'
                     }
@@ -2280,11 +2307,6 @@
                     const weightKg = this.weightUnit === 'kg' ? weight : this.lbsToKg(weight);
                     const smokingTempC = this.tempUnit === 'C' ? smokingTemp : this.fahrenheitToCelsius(smokingTemp);
 
-                    // Get desired red temp from slider if available, otherwise use formula default
-                    const tempSlider = document.getElementById('tempSlider');
-                    const desiredRedTempC = tempSlider ? parseFloat(tempSlider.value) : formula.desiredRedTempC;
-                    const userSelectedTemp = tempSlider && Math.abs(desiredRedTempC - formula.desiredRedTempC) > 0.5;
-
                     // ==================== MODELO COMPLETO DE TERNEZA ====================
                     // FASE 1: RAMP-UP (25°C → 62°C) - Rápido, bark se forma
                     const rampUpTempDiff = 62 - 25;
@@ -2297,7 +2319,9 @@
                         : stallMinutes;
 
                     // FASE 3: RENDERIZACIÓN (68°C → objetivo rojo/jugoso) - Rápido
-                    const pushTempDiff = desiredRedTempC - 68;
+                    // Usar temperatura seleccionada por usuario si está disponible, sino usar la del formula
+                    const finalDesiredTempC = this.userDesiredRedTemp || formula.desiredRedTempC;
+                    const pushTempDiff = finalDesiredTempC - 68;
                     const pushMinutes = pushTempDiff / formula.pushUpRate;
 
                     // Total
@@ -2334,7 +2358,7 @@
                         },
                         {
                             at: totalMinutes,
-                            msg: `✅ RENDERIZACIÓN LISTA @ ${desiredRedTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
+                            msg: `✅ RENDERIZACIÓN LISTA @ ${finalDesiredTempC}°C (rojo/jugoso) - REPOSA ${formula.holdingMin} min`,
                             phase: 'done'
                         }
                     ];
@@ -2358,13 +2382,13 @@
                         {
                             name: 'Renderización',
                             duration: Math.round(pushMinutes),
-                            tempRange: [68, desiredRedTempC],
+                            tempRange: [68, finalDesiredTempC],
                             percent: (pushMinutes / totalMinutes) * 100
                         }
                     ];
 
                     // Generar progresión de temperatura (25°C → temp rojo/jugosa)
-                    const temperatureRange = this.generateTempRange(25, desiredRedTempC, 8);
+                    const temperatureRange = this.generateTempRange(25, finalDesiredTempC, 8);
 
                     // Resultado final
                     const result = {
@@ -2380,11 +2404,11 @@
                         totalMinutes: totalMinutes,
                         minTempC: 25,
                         minTempF: this.celsiusToFahrenheit(25),
-                        desiredRedTempC: desiredRedTempC,
-                        desiredRedTempF: this.celsiusToFahrenheit(desiredRedTempC),
+                        desiredRedTempC: finalDesiredTempC,
+                        desiredRedTempF: this.celsiusToFahrenheit(finalDesiredTempC),
+                        userSelected: this.userDesiredRedTemp !== null, // true if user customized
                         holdingMin: formula.holdingMin,
                         temperatureRange: temperatureRange,
-                        userSelected: userSelectedTemp,
                         // NUEVO: Datos de fases y eventos
                         phases: phases,
                         events: events,
@@ -3205,9 +3229,9 @@
                 </div>
 
                 <!-- Quick Info: 2-column grid -->
-                <div class="results-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 15px 0;">
                     <div class="card" style="padding: 15px;">
-                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0; display: flex; align-items: center; gap: 4px;">🔴 Temp. Rojo/Jugoso ${result.userSelected ? '<span class="temp-badge">personalizado</span>' : ''}</h4>
+                        <h4 style="font-size: 0.85em; color: var(--accent); margin: 0 0 8px 0;">🔴 Temp. Rojo/Jugoso ${result.userSelected ? '<span style="font-size: 0.7em; background: rgba(255,122,61,0.2); padding: 2px 6px; border-radius: 3px; margin-left: 4px;">personalizado</span>' : ''}</h4>
                         <p style="font-size: 1.2em; font-weight: bold; margin: 0; color: var(--text);">${result.desiredRedTempC}°C</p>
                         <p style="font-size: 0.8em; color: var(--text-muted); margin: 4px 0 0 0;">(${result.desiredRedTempF}°F) Carne rosada/roja</p>
                     </div>
@@ -3291,6 +3315,8 @@
 
             if (tabName === 'mis-curados') {
                 renderActiveCures();
+            } else if (tabName === 'cronometro') {
+                timerManager.populateRecipeSelect();
             }
         }
 
@@ -3603,12 +3629,20 @@
                     if (e.key === 'ArrowLeft') this.prevStep();
                 });
 
-                // Set up temperature slider
-                const tempSlider = document.getElementById('tempSlider');
-                if (tempSlider) {
-                    tempSlider.addEventListener('input', (e) => {
-                        const value = e.target.value;
-                        document.getElementById('tempValue').textContent = value + '°C';
+                // Set up temperature selector (Phase 4)
+                const desiredTempSlider = document.getElementById('desiredTempSlider');
+                if (desiredTempSlider) {
+                    desiredTempSlider.addEventListener('input', (e) => {
+                        const temp = parseInt(e.target.value);
+                        calculator.userDesiredRedTemp = temp;
+
+                        // Update display
+                        document.getElementById('desiredTempDisplay').textContent = temp + '°C';
+
+                        // Update state label dynamically based on range
+                        const min = parseInt(e.target.min);
+                        const max = parseInt(e.target.max);
+                        wizardUI.updateTempState(temp, min, max);
                     });
                 }
 
@@ -3688,7 +3722,71 @@
                 setTimeout(() => {
                     this.goToStep(1);
                     this.setWrap(false);
+                    calculator.userDesiredRedTemp = null; // Reset user temp selection
                 }, 500);
+            }
+
+            updateTempSelector() {
+                // Update temperature selector based on meat type
+                const meatType = document.getElementById('meatType').value;
+                const formulas = calculator.getMeatFormulas();
+                const formula = formulas[meatType];
+
+                if (!formula) return;
+
+                const slider = document.getElementById('desiredTempSlider');
+                const lockMessage = document.getElementById('poultryLockMessage');
+                const minRange = formula.tempRange.min;
+                const maxRange = formula.tempRange.max;
+                const defaultTemp = formula.desiredRedTempC;
+
+                // Update slider min/max dynamically
+                slider.min = minRange;
+                slider.max = maxRange;
+                slider.value = defaultTemp;
+
+                // Update display
+                document.getElementById('desiredTempDisplay').textContent = defaultTemp + '°C';
+                this.updateTempState(defaultTemp, minRange, maxRange);
+
+                // Update range labels
+                const labels = document.querySelectorAll('.temp-range-label');
+                if (labels.length >= 3) {
+                    labels[0].textContent = `${minRange}°C`;
+                    labels[1].textContent = `${Math.round((minRange + maxRange) / 2)}°C`;
+                    labels[2].textContent = `${maxRange}°C`;
+                }
+
+                // Show/hide lock message for poultry
+                const isPoultry = meatType === 'pollo_entero' || meatType === 'pavo_entero';
+                if (isPoultry) {
+                    lockMessage.style.display = 'block';
+                    lockMessage.textContent = `🔒 ${formula.name}: Bloqueado en ${minRange}-${maxRange}°C (seguridad alimentaria)`;
+                } else {
+                    lockMessage.style.display = 'none';
+                }
+
+                // Set default weight
+                const weightInput = document.getElementById('weight');
+                if (weightInput) {
+                    weightInput.value = formula.standardWeightKg.toFixed(1);
+                }
+
+                // Reset user selection
+                calculator.userDesiredRedTemp = null;
+            }
+
+            updateTempState(temp, min, max) {
+                const range = max - min;
+                const mid = min + range / 2;
+                const upper = min + range * 0.75;
+
+                let state = 'Rojo (típico)';
+                if (temp <= mid - 5) state = `Rojo Frío (${temp}°C)`;
+                else if (temp >= upper) state = `Rojo Cálido (${temp}°C)`;
+                else state = `Rojo Medio (${temp}°C)`;
+
+                document.getElementById('desiredTempState').textContent = state;
             }
 
             focusInputOnStep() {
@@ -3797,46 +3895,728 @@
                 overlay.appendChild(popup);
                 document.body.appendChild(overlay);
             }
+        }
 
-            updateMeatSelection() {
-                const meatType = document.getElementById('meatType').value;
-                const formula = calculator.getMeatFormulas()[meatType];
+        // ================================================================
+        // 6.5. TIMER MANAGER - Cronómetro en vivo con gráfica
+        // ================================================================
+        class TimerManager extends EventEmitter {
+            constructor() {
+                super();
+                this.storageKey = 'bbq-cooking-sessions';
+                this.isRunning = false;
+                this.isPaused = false;
+                this.startTime = null;
+                this.elapsedSeconds = 0;
+                this.measurements = [];
+                this.currentRecipe = null;
+                this.timerInterval = null;
+                this.chart = null;
+                this.loadSessions();
+            }
 
-                if (formula) {
-                    // Auto-fill weight
-                    if (formula.standardWeightKg) {
-                        const weightInput = document.getElementById('weight');
-                        if (weightInput) {
-                            weightInput.value = formula.standardWeightKg;
-                        }
-                    }
-
-                    // Update temperature slider min/max
-                    const tempRange = formula.tempRange;
-                    const tempSlider = document.getElementById('tempSlider');
-                    const tempValue = document.getElementById('tempValue');
-                    const tempMin = document.getElementById('tempMin');
-                    const tempMax = document.getElementById('tempMax');
-
-                    if (tempSlider && tempRange) {
-                        tempSlider.min = tempRange.min;
-                        tempSlider.max = tempRange.max;
-                        tempSlider.value = formula.desiredRedTempC || tempRange.min;
-
-                        if (tempValue) {
-                            tempValue.textContent = tempSlider.value + '°C';
-                        }
-
-                        // Update range labels
-                        if (tempMin) {
-                            tempMin.textContent = `Rojo Frío (${tempRange.min}°C)`;
-                        }
-                        if (tempMax) {
-                            tempMax.textContent = `Gris (${tempRange.max}°C)`;
-                        }
-                    }
+            /**
+             * Cargar sesiones del localStorage
+             */
+            loadSessions() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    this.sessions = stored ? JSON.parse(stored) : [];
+                } catch (err) {
+                    console.error('Error cargando sesiones:', err);
+                    this.sessions = [];
                 }
             }
+
+            /**
+             * Guardar sesiones en localStorage
+             */
+            saveSessions() {
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.sessions));
+                } catch (err) {
+                    console.error('Error guardando sesiones:', err);
+                }
+            }
+
+            /**
+             * Nueva sesión (sin receta)
+             */
+            newSession() {
+                this.reset();
+                this.currentRecipe = null;
+                document.getElementById('timerRecipeSelect').value = '';
+                document.getElementById('expectedCurveInfo').style.display = 'none';
+                showToast('✓ Nueva sesión iniciada', 'success');
+            }
+
+            /**
+             * Cargar receta guardada
+             */
+            loadRecipe() {
+                const select = document.getElementById('timerRecipeSelect');
+                const recipeId = select.value;
+
+                if (!recipeId) {
+                    showToast('Selecciona una receta', 'warning');
+                    return;
+                }
+
+                const recipes = stateManager.getRecipes();
+                const recipe = recipes.find(r => r.id === parseInt(recipeId));
+
+                if (!recipe) {
+                    showToast('Receta no encontrada', 'error');
+                    return;
+                }
+
+                this.currentRecipe = recipe.fullResult;
+                this.reset();
+                this.generateExpectedCurve();
+                document.getElementById('expectedCurveInfo').style.display = 'block';
+                showToast(`✓ Receta cargada: ${recipe.meatName}`, 'success');
+            }
+
+            /**
+             * Generar curva esperada a partir de la receta
+             */
+            generateExpectedCurve() {
+                if (!this.currentRecipe) return;
+
+                const result = this.currentRecipe;
+                const totalMinutes = result.totalMinutes;
+
+                // Crear array con puntos de temperatura esperada basado en las 3 fases
+                this.expectedCurve = [];
+                const phases = result.phases;
+
+                let currentTime = 0;
+                phases.forEach((phase, phaseIdx) => {
+                    const phaseDuration = phase.duration;
+                    const [startTemp, endTemp] = phase.tempRange;
+                    const steps = Math.ceil(phaseDuration / 5); // punto cada 5 minutos
+
+                    for (let i = 0; i <= steps; i++) {
+                        const percent = i / steps;
+                        const phaseTime = phaseDuration * percent;
+                        const temp = startTemp + (endTemp - startTemp) * percent;
+
+                        this.expectedCurve.push({
+                            time: currentTime + phaseTime,
+                            temp: temp
+                        });
+                    }
+                    currentTime += phaseDuration;
+                });
+
+                // Mostrar info de receta esperada
+                document.getElementById('expectedCurveName').textContent = result.meatName;
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                document.getElementById('expectedCurveTime').textContent = `${hours}h ${mins}m`;
+            }
+
+            /**
+             * Iniciar cronómetro
+             */
+            start() {
+                if (this.isRunning) return;
+
+                this.isRunning = true;
+                this.isPaused = false;
+                this.startTime = Date.now() - (this.elapsedSeconds * 1000);
+
+                document.getElementById('timerStartBtn').style.display = 'none';
+                document.getElementById('timerPauseBtn').style.display = 'inline-block';
+                document.getElementById('timerStopBtn').style.display = 'inline-block';
+
+                this.timerInterval = setInterval(() => {
+                    this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.updateDisplay();
+                }, 100);
+
+                showToast('✓ Cronómetro iniciado', 'success');
+            }
+
+            /**
+             * Pausar cronómetro
+             */
+            pause() {
+                if (!this.isRunning) return;
+
+                this.isRunning = false;
+                this.isPaused = true;
+                clearInterval(this.timerInterval);
+
+                document.getElementById('timerPauseBtn').textContent = '▶️ Reanudar';
+                document.getElementById('timerPauseBtn').onclick = () => this.start();
+
+                showToast('⏸️ Cronómetro pausado', 'info');
+            }
+
+            /**
+             * Detener cronómetro
+             */
+            stop() {
+                this.isRunning = false;
+                this.isPaused = false;
+                clearInterval(this.timerInterval);
+
+                document.getElementById('timerStartBtn').style.display = 'inline-block';
+                document.getElementById('timerPauseBtn').style.display = 'none';
+                document.getElementById('timerPauseBtn').textContent = '⏸️ Pausar';
+                document.getElementById('timerPauseBtn').onclick = () => this.pause();
+                document.getElementById('timerStopBtn').style.display = 'none';
+
+                showToast('⏹️ Cronómetro detenido', 'warning');
+            }
+
+            /**
+             * Reiniciar sesión
+             */
+            reset() {
+                this.stop();
+                this.elapsedSeconds = 0;
+                this.measurements = [];
+                this.updateDisplay();
+                this.refreshLogTable();
+                this.updateChart();
+                showToast('🔄 Sesión reiniciada', 'info');
+            }
+
+            /**
+             * Actualizar display del cronómetro
+             */
+            updateDisplay() {
+                const hours = Math.floor(this.elapsedSeconds / 3600);
+                const minutes = Math.floor((this.elapsedSeconds % 3600) / 60);
+                const seconds = this.elapsedSeconds % 60;
+
+                const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                document.getElementById('timerDisplay').textContent = display;
+            }
+
+            /**
+             * Agregar medición de temperatura
+             */
+            addMeasurement() {
+                const tempInput = document.getElementById('timerTempInput');
+                const noteInput = document.getElementById('timerNoteInput');
+
+                const temp = parseFloat(tempInput.value);
+                if (isNaN(temp) || temp < 0 || temp > 100) {
+                    showToast('Temperatura inválida (0-100°C)', 'error');
+                    return;
+                }
+
+                const measurement = {
+                    timeSeconds: this.elapsedSeconds,
+                    timeMinutes: this.elapsedSeconds / 60,
+                    temp: temp,
+                    note: noteInput.value || '',
+                    timestamp: new Date().toISOString(),
+                    expectedTemp: this.getExpectedTemp(this.elapsedSeconds / 60)
+                };
+
+                this.measurements.push(measurement);
+                tempInput.value = '';
+                noteInput.value = '';
+
+                this.refreshLogTable();
+                this.updateChart();
+                showToast('✓ Medición agregada', 'success');
+            }
+
+            /**
+             * Obtener temperatura esperada para un tiempo dado
+             */
+            getExpectedTemp(timeMinutes) {
+                if (!this.expectedCurve || this.expectedCurve.length === 0) return null;
+
+                // Encontrar puntos cercanos
+                const closest = this.expectedCurve.reduce((prev, curr) => {
+                    return Math.abs(curr.time - timeMinutes) < Math.abs(prev.time - timeMinutes) ? curr : prev;
+                });
+
+                return closest.temp;
+            }
+
+            /**
+             * Calcular desviación
+             */
+            calculateDeviation(realTemp, expectedTemp) {
+                if (expectedTemp === null) return null;
+                return realTemp - expectedTemp;
+            }
+
+            /**
+             * Obtener clase de desviación (para colores)
+             */
+            getDeviationClass(deviation) {
+                if (deviation === null) return '';
+                if (Math.abs(deviation) <= 5) return 'good';
+                if (Math.abs(deviation) <= 10) return 'warning';
+                return 'alert';
+            }
+
+            /**
+             * Refrescar tabla de log
+             */
+            refreshLogTable() {
+                const tbody = document.getElementById('timerLogTableBody');
+
+                if (this.measurements.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-dim);">Sin mediciones aún</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = this.measurements.map(m => {
+                    const deviation = this.calculateDeviation(m.temp, m.expectedTemp);
+                    const deviationClass = this.getDeviationClass(deviation);
+                    const deviationText = deviation === null ? '—' : `${deviation >= 0 ? '+' : ''}${deviation.toFixed(1)}°C`;
+
+                    const timeStr = `${Math.floor(m.timeMinutes / 60)}:${String(Math.floor(m.timeMinutes % 60)).padStart(2, '0')}`;
+                    const expectedStr = m.expectedTemp !== null ? `${m.expectedTemp.toFixed(1)}°C` : '—';
+
+                    return `
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 10px; color: var(--text-muted);">${timeStr}</td>
+                            <td style="padding: 10px; color: var(--text); font-weight: 700;">${m.temp.toFixed(1)}°C</td>
+                            <td style="padding: 10px; color: var(--text-muted);">${expectedStr}</td>
+                            <td style="padding: 10px;"><span class="timer-deviation ${deviationClass}">${deviationText}</span></td>
+                            <td style="padding: 10px; color: var(--text-dim); font-size: 0.85em;">${m.note}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            /**
+             * Actualizar gráfica comparativa
+             */
+            updateChart() {
+                const ctx = document.getElementById('timerChart');
+                if (!ctx) return;
+
+                // Destruir gráfica anterior si existe
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+
+                const labels = [];
+                const expectedData = [];
+                const realData = [];
+                const colors = [];
+
+                // Agregar puntos de la curva esperada
+                if (this.expectedCurve && this.expectedCurve.length > 0) {
+                    this.expectedCurve.forEach(point => {
+                        if (point.time <= (this.elapsedSeconds / 60) + 5) {
+                            labels.push(Math.floor(point.time));
+                            expectedData.push(point.temp);
+                        }
+                    });
+                }
+
+                // Agregar puntos reales
+                this.measurements.forEach(m => {
+                    realData.push(m.temp);
+                    const deviation = this.calculateDeviation(m.temp, m.expectedTemp);
+                    const color = deviation === null ? '#999' :
+                                  Math.abs(deviation) <= 5 ? '#6cba6c' :
+                                  Math.abs(deviation) <= 10 ? '#ff7a3d' : '#c0392b';
+                    colors.push(color);
+                });
+
+                // Crear dataset para datos reales
+                const realDataset = {
+                    label: 'Temperatura Real',
+                    data: this.measurements.map(m => m.temp),
+                    borderColor: '#6cba6c',
+                    backgroundColor: 'rgba(108, 186, 108, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: colors,
+                    pointBorderColor: colors,
+                    pointBorderWidth: 2
+                };
+
+                // Crear dataset para curva esperada
+                const expectedDataset = {
+                    label: 'Curva Esperada',
+                    data: this.expectedCurve ? this.expectedCurve.map(p => ({ x: p.time, y: p.temp })) : [],
+                    borderColor: '#ff7a3d',
+                    backgroundColor: 'rgba(255, 122, 61, 0.05)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    type: 'line'
+                };
+
+                // Generar labels (minutos)
+                const maxTime = Math.max(
+                    this.elapsedSeconds / 60,
+                    this.expectedCurve ? Math.max(...this.expectedCurve.map(p => p.time)) : 0
+                );
+
+                const chartLabels = [];
+                for (let i = 0; i <= Math.ceil(maxTime); i += 5) {
+                    chartLabels.push(`${i}m`);
+                }
+
+                this.chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [expectedDataset, realDataset]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'nearest' },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#f5ebe0', font: { size: 12, weight: '700' } }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#f5ebe0',
+                                bodyColor: '#f5ebe0',
+                                borderColor: '#ff7a3d',
+                                borderWidth: 1,
+                                padding: 10,
+                                displayColors: true
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: { display: true, text: 'Tiempo (minutos)', color: '#f5ebe0' },
+                                ticks: { color: '#b9a89a' },
+                                grid: { color: 'rgba(245, 184, 65, 0.1)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Temperatura (°C)', color: '#f5ebe0' },
+                                ticks: { color: '#b9a89a' },
+                                grid: { color: 'rgba(245, 184, 65, 0.1)' },
+                                min: 20,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Guardar sesión de cocción
+             */
+            saveCookingSession() {
+                if (this.measurements.length === 0) {
+                    showToast('Agrega al menos una medición', 'warning');
+                    return;
+                }
+
+                const session = {
+                    id: Date.now(),
+                    recipeId: this.currentRecipe ? this.currentRecipe.id : null,
+                    recipeName: this.currentRecipe ? this.currentRecipe.meatName : 'Sin receta',
+                    startTime: new Date().toISOString(),
+                    totalTimeSeconds: this.elapsedSeconds,
+                    measurements: this.measurements,
+                    expectedCurve: this.expectedCurve,
+                    createdAt: new Date().toLocaleString('es-ES')
+                };
+
+                this.sessions.push(session);
+                this.saveSessions();
+                showToast('✓ Sesión guardada', 'success');
+            }
+
+            /**
+             * Exportar log a CSV
+             */
+            exportLog() {
+                if (this.measurements.length === 0) {
+                    showToast('No hay mediciones para exportar', 'warning');
+                    return;
+                }
+
+                const headers = ['Tiempo', 'Temp Real (°C)', 'Temp Esperada (°C)', 'Desviación (°C)', 'Nota'];
+                const rows = this.measurements.map(m => {
+                    const deviation = this.calculateDeviation(m.temp, m.expectedTemp);
+                    const timeStr = `${Math.floor(m.timeMinutes / 60)}:${String(Math.floor(m.timeMinutes % 60)).padStart(2, '0')}`;
+                    return [
+                        timeStr,
+                        m.temp.toFixed(1),
+                        m.expectedTemp !== null ? m.expectedTemp.toFixed(1) : '—',
+                        deviation !== null ? deviation.toFixed(1) : '—',
+                        m.note
+                    ];
+                });
+
+                const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bbq-session-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                showToast('✓ CSV exportado', 'success');
+            }
+
+            /**
+             * Comparar con sesiones anteriores
+             */
+            compareSessions() {
+                const container = document.getElementById('compareSessionsContainer');
+
+                if (this.sessions.length === 0) {
+                    showToast('No hay sesiones anteriores', 'info');
+                    return;
+                }
+
+                container.style.display = 'block';
+                const list = document.getElementById('historicalSessionsList');
+
+                list.innerHTML = this.sessions.map(session => `
+                    <div style="background: var(--surface); padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <h4 style="color: var(--accent); margin-bottom: 8px;">${session.recipeName}</h4>
+                        <p style="color: var(--text-muted); margin: 5px 0; font-size: 0.9em;">
+                            <strong>Tiempo total:</strong> ${Math.floor(session.totalTimeSeconds / 3600)}h ${Math.floor((session.totalTimeSeconds % 3600) / 60)}m
+                        </p>
+                        <p style="color: var(--text-muted); margin: 5px 0; font-size: 0.9em;">
+                            <strong>Mediciones:</strong> ${session.measurements.length}
+                        </p>
+                        <p style="color: var(--text-dim); margin: 5px 0; font-size: 0.85em;">
+                            ${session.createdAt}
+                        </p>
+                    </div>
+                `).join('');
+
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            /**
+             * Llenar select de recetas
+             */
+            populateRecipeSelect() {
+                const select = document.getElementById('timerRecipeSelect');
+                const recipes = stateManager.getRecipes();
+
+                select.innerHTML = '<option value="">-- Sin receta --</option>' + recipes.map(r =>
+                    `<option value="${r.id}">${r.meatName} - ${r.weightKg}kg @ ${r.smokingTempC}°C</option>`
+                ).join('');
+            }
+        }
+
+        // ================================================================
+        // 6.5 ALTITUDE DETECTION & ADJUSTMENT
+        // ================================================================
+        let currentAltitude = null;
+
+        function detectAltitude() {
+            const btn = document.querySelector('[onclick="detectAltitude()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Detectando...';
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const altitudeFromGPS = position.coords.altitude;
+
+                        // Use GPS altitude if available, otherwise estimate
+                        if (altitudeFromGPS !== null) {
+                            currentAltitude = Math.round(altitudeFromGPS);
+                        } else {
+                            // Fallback: estimate using simple formula
+                            currentAltitude = estimateAltitudeFromCoordinates(lat, lon);
+                        }
+
+                        // Display altitude
+                        const altitudeDisplay = document.getElementById('altitudeDisplay');
+                        altitudeDisplay.textContent = currentAltitude > 0 ? `${currentAltitude}m` : 'Sea level';
+
+                        // Apply altitude adjustment (~8% per 1000m)
+                        const altitudeAdjustment = currentAltitude > 0 ? (currentAltitude / 1000) * 0.08 : 0;
+
+                        if (btn) {
+                            btn.textContent = `✓ Detectado (${currentAltitude}m)`;
+                            btn.disabled = false;
+                        }
+                        showToast(`✓ Altitud detectada: ${currentAltitude}m. Ajuste: +${(altitudeAdjustment * 100).toFixed(1)}%`, 'success');
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        if (btn) {
+                            btn.textContent = 'Error. Reintentar';
+                            btn.disabled = false;
+                        }
+                        showToast('No se pudo detectar altitud. Intenta habilitar ubicación.', 'error');
+                    },
+                    { timeout: 10000, enableHighAccuracy: true }
+                );
+            } else {
+                if (btn) {
+                    btn.textContent = 'No soportado';
+                    btn.disabled = false;
+                }
+                showToast('Geolocation no soportado en este navegador', 'error');
+            }
+        }
+
+        function estimateAltitudeFromCoordinates(lat, lon) {
+            // Simple fallback: return 0 as baseline (user at sea level)
+            return 0;
+        }
+
+        // ================================================================
+        // 6.6 RENDERING LEVEL BUTTONS
+        // ================================================================
+        let currentRenderingLevel = 'rosa'; // Default: medium rare/red
+
+        function setRenderingLevel(level) {
+            currentRenderingLevel = level;
+
+            // Get current meat formula
+            const meatType = document.getElementById('meatType').value;
+            const formula = calculator.getMeatFormulas()[meatType];
+
+            if (!formula) return;
+
+            let tempC;
+            const tempMin = formula.tempRange.min;
+            const tempDefault = formula.desiredRedTempC;
+            const tempMax = formula.tempRange.max;
+
+            // Set temperature based on level
+            if (level === 'raro') {
+                tempC = tempMin + 3; // Cold rare
+            } else if (level === 'rosa') {
+                tempC = tempDefault; // Medium rare/red (default)
+            } else if (level === 'gris') {
+                tempC = tempMax; // Well done/grey
+            }
+
+            // Update display
+            document.getElementById('selectedRenderingTemp').textContent = `${tempC}°C`;
+
+            // Update buttons
+            document.querySelectorAll('.rendering-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(level === 'raro' ? 'rarBtn' : level === 'rosa' ? 'rosBtn' : 'grisBtn')
+                .classList.add('active');
+
+            // Store in calculator for next calculation
+            calculator.userDesiredRedTemp = tempC;
+
+            // Show toast
+            const levelNames = { raro: 'Raro (muy rojo)', rosa: 'Rosa (rojo/jugoso)', gris: 'Gris (más cocido)' };
+            showToast(`📊 Nivel cambiado a ${levelNames[level]} @ ${tempC}°C`, 'info');
+        }
+
+        // ================================================================
+        // 6.7 COOKING CURVE CHART GENERATION
+        // ================================================================
+        let cookingCurveChart = null;
+
+        function generateCookingCurve(phases, totalMinutes, desiredTemp) {
+            if (!phases || phases.length === 0) return null;
+
+            const labels = [];
+            const rampUpData = [];
+            const stallData = [];
+            const renderData = [];
+
+            // Generate labels every 30 minutes
+            for (let i = 0; i <= totalMinutes; i += 30) {
+                labels.push(i === 0 ? '0' : `${Math.floor(i / 60)}h ${i % 60}m`);
+            }
+
+            // Phase durations and rates
+            const rampUpPhase = phases[0];
+            const stallPhase = phases[1];
+            const renderPhase = phases[2];
+
+            const rampUpDuration = rampUpPhase.duration;
+            const stallDuration = stallPhase.duration;
+            const renderDuration = renderPhase.duration;
+
+            const rampUpRate = (62 - 25) / rampUpDuration;
+            const stallRate = (68 - 62) / stallDuration;
+            const renderRate = (desiredTemp - 68) / renderDuration;
+
+            // Generate data points for chart
+            for (let i = 0; i <= totalMinutes; i += 30) {
+                let temp = 25;
+
+                if (i <= rampUpDuration) {
+                    temp = 25 + (rampUpRate * i);
+                    rampUpData.push(Math.round(temp * 10) / 10);
+                    stallData.push(null);
+                    renderData.push(null);
+                } else if (i <= rampUpDuration + stallDuration) {
+                    temp = 62 + (stallRate * (i - rampUpDuration));
+                    rampUpData.push(null);
+                    stallData.push(Math.round(temp * 10) / 10);
+                    renderData.push(null);
+                } else if (i <= totalMinutes) {
+                    temp = 68 + (renderRate * (i - rampUpDuration - stallDuration));
+                    rampUpData.push(null);
+                    stallData.push(null);
+                    renderData.push(Math.round(Math.min(temp, desiredTemp) * 10) / 10);
+                }
+            }
+
+            return {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '🌳 Ramp-up',
+                        data: rampUpData,
+                        borderColor: '#6BCB77',
+                        backgroundColor: 'rgba(107, 203, 119, 0.2)',
+                        fill: true,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: '#6BCB77',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '⏱️ Stall',
+                        data: stallData,
+                        borderColor: '#FFD93D',
+                        backgroundColor: 'rgba(255, 217, 61, 0.2)',
+                        fill: true,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: '#FFD93D',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '🔴 Renderización',
+                        data: renderData,
+                        borderColor: '#FF6B6B',
+                        backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                        fill: true,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointBackgroundColor: '#FF6B6B',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            };
         }
 
         // ================================================================
@@ -3846,6 +4626,7 @@
         const validator = new BBQValidator();
         const stateManager = new StateManager();
         const cureCalc = new CureCalculator();
+        const timerManager = new TimerManager();
         const wizardUI = new WizardUI();
 
         let lastResult = null;
