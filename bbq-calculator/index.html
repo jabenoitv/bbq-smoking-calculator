@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔥 BBQ Smoking Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #1a1410;
@@ -681,6 +682,68 @@
             margin-bottom: 15px;
             color: var(--accent);
             font-size: 1.1em;
+        }
+
+        #cookingCurveChart {
+            max-width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .altitude-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(108, 186, 108, 0.1);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--success);
+        }
+
+        .altitude-info button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .altitude-info button:hover {
+            opacity: 0.9;
+        }
+
+        .rendering-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .rendering-btn {
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+        }
+
+        .rendering-btn:hover {
+            border-color: var(--primary);
+            background: rgba(226, 88, 34, 0.1);
+        }
+
+        .rendering-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            border-color: var(--accent);
+            color: white;
         }
 
         .bars {
