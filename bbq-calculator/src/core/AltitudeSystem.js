@@ -147,13 +147,13 @@ class AltitudeSystem extends EventEmitter {
    * @returns {Object|null}
    */
   getLocation() {
-    if (!this.coordinates || !this.detected) {
+    if (!this.detected) {
       return null;
     }
     return {
       altitude: this.altitude,
-      latitude: this.coordinates.latitude,
-      longitude: this.coordinates.longitude,
+      latitude: this.coordinates?.latitude || null,
+      longitude: this.coordinates?.longitude || null,
       adjustmentFactor: this.getAdjustmentFactor()
     };
   }

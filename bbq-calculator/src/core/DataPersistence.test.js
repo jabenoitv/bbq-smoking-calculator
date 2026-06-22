@@ -110,7 +110,7 @@ runner.test('RecipeStore filtra por tipo de carne', function() {
   const store = new RecipeStore();
   store.saveRecipe(mockRecipe);
 
-  const recipe2 = { ...mockRecipe, meatType: 'pollo_entero' };
+  const recipe2 = { ...mockRecipe, id: 'recipe_2', meatType: 'pollo_entero' };
   store.saveRecipe(recipe2);
 
   const brisket = store.listRecipes({ meatType: 'tapapecho' });

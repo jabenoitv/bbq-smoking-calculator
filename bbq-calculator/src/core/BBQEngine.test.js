@@ -72,7 +72,7 @@ runner.test('Conversión: Celsius a Fahrenheit', function() {
 runner.test('Conversión: Fahrenheit a Celsius', function() {
   runner.assertEqual(engine.fahrenheitToCelsius(32), 0, 'Cero grados');
   runner.assertEqual(engine.fahrenheitToCelsius(212), 100, '212°F = 100°C');
-  runner.assertEqual(engine.fahrenheitToCelsius(225), 107, '225°F = 107°C');
+  runner.assertApprox(engine.fahrenheitToCelsius(225), 107.2, 0.1, '225°F = 107.2°C');
 });
 
 runner.test('Conversión: kg a lbs', function() {

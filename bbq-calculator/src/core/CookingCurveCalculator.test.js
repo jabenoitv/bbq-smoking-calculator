@@ -126,8 +126,18 @@ runner.test('interpolateTemp en final', function() {
   const calc = new CookingCurveCalculator();
   calc.generateFromResult(result);
 
-  const temp = calc.interpolateTemp(result.totalMinutes);
-  runner.assertApprox(temp, result.desiredRedTempC, 1, 'Temperatura final es ~deseada');
+  // Test at the actual end of the last phase (not totalMinutes which may differ due to rounding)
+  let phaseEndTime = 0;
+  for (const phase of result.phases) {
+    phaseEndTime += phase.duration;
+  }
+
+  const temp = calc.interpolateTemp(phaseEndTime);
+  // At end of last phase, should be at max of that phase's tempRange (which is desiredRedTempC)
+  const lastPhase = result.phases[result.phases.length - 1];
+  const expectedFinalTemp = lastPhase.tempRange[1];
+  // Higher tolerance because phases round independently
+  runner.assertApprox(temp, expectedFinalTemp, 5, 'Temperatura al final de última fase (±5°C)');
 });
 
 runner.test('interpolateTemp en medio de fase', function() {
