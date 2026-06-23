@@ -1,6 +1,7 @@
 [build]
   base = "bbq-calculator"
-  publish = "."
+  command = "npm run build"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
