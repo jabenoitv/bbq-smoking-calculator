@@ -1,40 +1,159 @@
-# 🔧 Gadgets Domain
+# Gadgets Domain — Quick Tools for BBQ Calculations
 
-**Responsabilidad:** Herramientas rápidas y utilitarias (convertidores, rub calculator, detector de altitud)
+Herramientas rápidas y convertidores para cálculos BBQ: calculadora de rub, convertidores de temperatura/peso, detector de altitud.
 
-## Módulos (TO BE CREATED)
+## Módulos
 
-### Calculators
-- **RubCalculator.js** (NEW) — Calculador de cantidades de rub
-  - Métodos: `calculate(weightKg, meatType)` → {salt, pepper, garlic, sugar, ...}
-  - Ratios estándar por tipo de carne
-  - Entrada: peso carne
-  - Salida: cantidades en gramos
+### 1. **RubCalculator.js** (12+ tests)
 
-### Converters
-- **TempConverter.js** (NEW) — Conversor de temperatura
-  - Métodos: `celsiusToFahrenheit()`, `fahrenheitToCelsius()`, `formatTemp()`
-  - Input: valor en una unidad
-  - Output: valor en otra unidad + ambas mostradas
+Calcula la cantidad de especias (rub) necesarias para una carne en base a su tipo y peso.
 
-- **WeightConverter.js** (NEW) — Conversor de peso
-  - Métodos: `kgToLbs()`, `lbsToKg()`, `formatWeight()`
-  - Input: valor en una unidad
-  - Output: valor en otra unidad + ambas mostradas
+**Responsabilidad:** 
+- Cálculo de cantidades de rub (~10-15% del peso de la carne)
+- Desglose de ingredientes (sal, azúcar, paprika, etc.)
+- Generación de instrucciones de aplicación
 
-### Location
-- **AltitudeDetector.js** (NEW) — Detector automático de altitud
-  - Métodos: `async detect()`, `estimateFromCoordinates(lat, lon)`, `getAdjustmentFactor(altitudeM)`
-  - Usa Geolocation API + OpenElevation API
-  - Fallback manual para testing
-  - Fórmula: +8% de tiempo per cada 1000m
-  - Emite eventos: `altitude-detected`, `altitude-error`
+**Métodos públicos:**
+- `calculate(meatType, weightKg)` → { rubGrams, ingredients, instructions }
+- `getAvailableMeatTypes()` → string[]
+- `isValidMeatType(meatType)` → boolean
 
-### Integration
-- **quickCureCalc()** — Atajo rápido que integra con Curing domain
-  - Acceso directo a CureCalculator sin navegar a "Curados"
+**Tipos de carne soportados:**
+- brisket (12% rub)
+- pork_butt (14% rub)
+- ribs (15% rub)
+- chicken (10% rub)
+- turkey (11% rub)
 
-## Flujo de Datos
+**Ejemplo:**
+```javascript
+const result = RubCalculator.calculate('brisket', 5.0);
+// { rubGrams: 600, ingredients: {...}, instructions: [...] }
+```
+
+---
+
+### 2. **TempConverter.js** (14+ tests)
+
+Convierte temperaturas entre Celsius y Fahrenheit con precisión a 0.1°.
+
+**Responsabilidad:**
+- Conversión C ↔ F
+- Conversión por lotes (arrays)
+- Generación de rangos de temperatura
+
+**Métodos públicos:**
+- `celsiusToFahrenheit(celsius)` → { value, unit, formatted }
+- `fahrenheitToCelsius(fahrenheit)` → { value, unit, formatted }
+- `celsiusToFahrenheitArray(array)` → Object[]
+- `fahrenheitToCelsiusArray(array)` → Object[]
+- `convertAndCompare(value, unit)` → { celsius, fahrenheit }
+- `getTemperatureRange(start, end, unit, step)` → { celsius[], fahrenheit[] }
+
+**Puntos de referencia clave:**
+- 0°C = 32°F (congelación)
+- 100°C = 212°F (ebullición)
+- 37°C = 98.6°F (temperatura corporal)
+
+**Ejemplo:**
+```javascript
+const f = TempConverter.celsiusToFahrenheit(25);
+// { value: 77, unit: '°F', formatted: '77°F' }
+```
+
+---
+
+### 3. **WeightConverter.js** (14+ tests)
+
+Convierte pesos entre kilogramos, libras y gramos con precisión a 0.01 unidades.
+
+**Responsabilidad:**
+- Conversión kg ↔ lbs
+- Conversión kg ↔ g y g ↔ lbs
+- Conversión por lotes
+- Comparación multi-unidad
+
+**Métodos públicos:**
+- `kgToLbs(kg)` → { value, unit, formatted }
+- `lbsToKg(lbs)` → { value, unit, formatted }
+- `kgToGrams(kg)` → { value, unit, formatted }
+- `gramsToKg(grams)` → { value, unit, formatted }
+- `lbsToGrams(lbs)` → { value, unit, formatted }
+- `gramsToLbs(grams)` → { value, unit, formatted }
+- `convertAndCompare(value, unit)` → { kg, lbs, grams }
+- `batchConvert(values, fromUnit, toUnit)` → Object[]
+
+**Unidades soportadas:** kg, lbs, g
+
+**Ejemplo:**
+```javascript
+const lbs = WeightConverter.kgToLbs(2);
+// { value: 4.41, unit: 'lbs', formatted: '4.41 lbs' }
+```
+
+---
+
+### 4. **AltitudeDetector.js** (14+ tests)
+
+Detecta la altitud del usuario y calcula el ajuste de tiempo de cocción.
+
+**Responsabilidad:**
+- Detección de altitud vía Geolocation API
+- Fallback a OpenElevation API + caché en localStorage
+- Cálculo de ajuste de tiempo de cocción (+8% por 1000m)
+
+**Métodos públicos:**
+- `async detect()` → { altitude, estimatedAltitudeAdjustmentPercent, isCached }
+- `estimateAltitudeFromCoordinates(lat, lon)` → number (metros)
+- `calculateCookingTimeAdjustment(altitudeMeters)` → number (%)
+- `getAdjustedCookingTime(totalSeconds, altitudeMeters)` → number
+- `getAdjustmentWarningLevel(altitudeMeters)` → 'low' | 'medium' | 'high'
+- `cacheAltitude(data)` → void
+- `getCachedAltitude()` → Object | null
+- `clearCache()` → void
+
+**Fórmula:**
+- Ajuste = +8% de tiempo por cada 1000m de altitud
+
+**Niveles de advertencia:**
+- **low:** 0-999m
+- **medium:** 1000-1999m
+- **high:** 2000m+
+
+**Fuentes de datos:**
+1. Geolocation API (navegador)
+2. OpenElevation API fallback
+3. Base de datos de ubicaciones conocidas
+4. localStorage caché (24 horas)
+
+**Ejemplo:**
+```javascript
+const altitude = await AltitudeDetector.detect();
+// { altitude: 1500, estimatedAltitudeAdjustmentPercent: 12.4, ... }
+```
+
+---
+
+## Test Coverage
+
+Total: **50+ tests**
+
+| Módulo | Tests | Estado |
+|--------|-------|--------|
+| RubCalculator | 12+ | ✅ |
+| TempConverter | 14+ | ✅ |
+| WeightConverter | 14+ | ✅ |
+| AltitudeDetector | 14+ | ✅ |
+| **Total** | **50+** | **✅** |
+
+**Ejecutar tests:**
+```bash
+node src/domains/gadgets/gadgets.test.js
+```
+
+---
+
+## Data Flow
 
 ```
 Usuario abre Tab "Gadgets"
@@ -43,8 +162,7 @@ Disponibles:
   1. Temp Converter (C ↔ F)
   2. Weight Converter (kg ↔ lbs)
   3. Rub Calculator (peso → cantidades)
-  4. Quick Cure Calc (atajo a Curing)
-  5. Altitude Detector (auto / manual)
+  4. Altitude Detector (auto / manual)
   ↓
 Usuario selecciona herramienta
   ↓
@@ -53,66 +171,15 @@ Calcula / convierte
 Muestra resultado
 ```
 
-## Input
+---
 
-### TempConverter
-- Valor numérico
-- Unidad origen (°C o °F)
+## Error Handling
 
-### WeightConverter
-- Valor numérico
-- Unidad origen (kg o lbs)
+- ✅ Validación de entrada (tipos, rangos)
+- ✅ Errores descriptivos
+- ✅ Fallbacks (AltitudeDetector: caché → estimación)
+- ✅ No rompe en casos límite
 
-### RubCalculator
-- Peso de carne (kg o lbs)
-- Tipo de carne (opcional)
+---
 
-### AltitudeDetector
-- Auto: Permite geolocalización
-- Manual: Ingresa valor en metros
-
-### QuickCureCalc
-- Redirige a tab "Curados" o abre modal
-
-## Output
-
-### TempConverter
-- Valor convertido
-- Ambas unidades visibles
-
-### WeightConverter
-- Valor convertido
-- Ambas unidades visibles
-
-### RubCalculator
-- Tabla con cantidades (salt, pepper, garlic, sugar, etc.)
-- Unidades en gramos
-
-### AltitudeDetector
-- Altitud detectada (m)
-- Factor de ajuste (multiplicador para tiempo)
-- Status: detected / error / manual
-
-## Tests
-
-- `RubCalculator.test.js` — 15 tests
-- `TempConverter.test.js` — 12 tests
-- `WeightConverter.test.js` — 12 tests
-- `AltitudeDetector.test.js` — 20 tests
-- `gadgets.test.js` — integración dominio
-
-**Total: 59+ tests (nuevos)**
-
-## Estados
-
-- 🆕 RubCalculator: Requiere implementación
-- 🆕 Converters: Requiere implementación
-- 🆕 AltitudeDetector: Requiere refactor de AltitudeSystem (M2)
-- 🔄 Integration: Requiere orquestación
-
-## Notas
-
-- Todas las herramientas son independientes (standalone)
-- Los convertidores pueden usarse en cualquier otro lugar de la app
-- RubCalculator puede ser reutilizado en recetas guardadas
-- AltitudeDetector será usado por Smoking domain para auto-detectar altitud
+_Gadgets Domain · FASE 6 · Completa con 50+ tests_
