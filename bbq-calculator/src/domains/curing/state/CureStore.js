@@ -3,8 +3,11 @@
  * Responsabilidad única: Gestionar curados activos en localStorage
  */
 
-class CureStore {
+import EventEmitter from '../../shared/EventEmitter.js';
+
+class CureStore extends EventEmitter {
   constructor() {
+    super();
     this.activeCures = this.loadActiveCures();
   }
 
@@ -42,6 +45,7 @@ class CureStore {
 
     this.activeCures.push(cure);
     this.persistActiveCures();
+    this.emit('cure-added', { ...cure });
 
     return { ...cure };
   }
@@ -74,11 +78,15 @@ class CureStore {
    * @returns {Object|null}
    */
   markComplete(cureId, completionData = {}) {
-    return this.updateActiveCure(cureId, {
+    const updated = this.updateActiveCure(cureId, {
       status: 'completed',
       completedAt: new Date().toISOString(),
       ...completionData
     });
+    if (updated) {
+      this.emit('cure-completed', updated);
+    }
+    return updated;
   }
 
   /**
@@ -88,11 +96,15 @@ class CureStore {
    */
   deleteActiveCure(cureId) {
     const initialLength = this.activeCures.length;
+    const deleted = this.activeCures.find(c => c.id === cureId);
 
     this.activeCures = this.activeCures.filter(c => c.id !== cureId);
 
     if (this.activeCures.length < initialLength) {
       this.persistActiveCures();
+      if (deleted) {
+        this.emit('cure-deleted', deleted);
+      }
       return true;
     }
 
@@ -232,6 +244,15 @@ class CureStore {
     } catch (error) {
       console.error('Failed to persist active cures to storage:', error);
     }
+  }
+
+  /**
+   * Limpia todos los curados
+   */
+  clear() {
+    this.activeCures = [];
+    this.persistActiveCures();
+    this.emit('cures-cleared');
   }
 }
 
