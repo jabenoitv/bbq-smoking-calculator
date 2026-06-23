@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 BBQ Smoking Calculator - Modular</title>
+    <style>
+        :root {
+            --bg: #1a1410;
+            --surface: #241b15;
+            --surface-2: #2f241c;
+            --primary: #e25822;
+            --primary-2: #ff7a3d;
+            --accent: #f5b841;
+            --success: #6cba6c;
+            --danger: #c0392b;
+            --text: #f5ebe0;
+            --text-muted: #b9a89a;
+            --text-dim: #8a7a6e;
+            --radius: 14px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(226, 88, 34, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(160deg, #1a1410 0%, #2a1a12 100%);
+            min-height: 100vh;
+            padding: 15px;
+            color: var(--text);
+        }
+
+        #app {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(245, 184, 65, 0.15);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(245, 184, 65, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface-2);
+            border: 1px solid rgba(245, 184, 65, 0.2);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface-3);
+            box-shadow: 0 0 0 3px rgba(226, 88, 34, 0.1);
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(226, 88, 34, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(226, 88, 34, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: var(--surface-2);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .notification.error {
+            background: var(--danger);
+            color: white;
+        }
+
+        .notification.info {
+            background: var(--primary);
+            color: white;
+        }
+
+        .notification.warning {
+            background: var(--accent);
+            color: #1a1410;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🔥 BBQ Smoking Calculator</h1>
+            <p>Cálculos científicos para tu próxima sesión de ahumado</p>
+        </div>
+
+        <div class="tabs-container" id="tabsContainer"></div>
+
+        <div id="tabContent"></div>
+    </div>
+
+    <script type="module">
+        // Importar el orquestador de aplicación
+        import { app } from './src/App.js';
+
+        // Estado UI
+        const ui = {
+            tabs: {},
+            currentTab: 'ahumado',
+
+            async init() {
+                this.renderTabs();
+                this.switchTab('ahumado');
+                this.setupEventListeners();
+            },
+
+            renderTabs() {
+                const tabsInfo = app.getTabsInfo();
+                const container = document.getElementById('tabsContainer');
+
+                tabsInfo.forEach(tab => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-btn';
+                    btn.textContent = tab.label;
+                    btn.onclick = () => this.switchTab(tab.name);
+                    container.appendChild(btn);
+                    this.tabs[tab.name] = btn;
+                });
+            },
+
+            switchTab(tabName) {
+                // Actualizar app state
+                app.switchTab(tabName);
+                this.currentTab = tabName;
+
+                // Actualizar UI
+                Object.values(this.tabs).forEach(btn => btn.classList.remove('active'));
+                this.tabs[tabName].classList.add('active');
+
+                // Renderizar contenido
+                this.renderTabContent(tabName);
+            },
+
+            renderTabContent(tabName) {
+                const content = document.getElementById('tabContent');
+                content.innerHTML = '';
+
+                switch(tabName) {
+                    case 'ahumado':
+                        this.renderSmokingTab(content);
+                        break;
+                    case 'cronometro':
+                        this.renderTimerTab(content);
+                        break;
+                    case 'curados':
+                        this.renderCuringTab(content);
+                        break;
+                    case 'mis-curados':
+                        this.renderActiveCuresTab(content);
+                        break;
+                    case 'gadgets':
+                        this.renderGadgetsTab(content);
+                        break;
+                }
+            },
+
+            renderSmokingTab(container) {
+                container.innerHTML = `
+                    <div class="section">
+                        <h2>Cálculo de Tiempo de Ahumado</h2>
+                        <div class="form-group">
+                            <label>Tipo de Carne</label>
+                            <select id="meatType">
+                                <option value="tapapecho">Tapapecho (Brisket)</option>
+                                <option value="plateada">Plateada</option>
+                                <option value="punta_ganso">Punta de Ganso</option>
+                                <option value="asado_tira">Asado Tira</option>
+                                <option value="paleta_cerdo">Paleta de Cerdo</option>
+                                <option value="costillar_cerdo">Costillar de Cerdo</option>
+                                <option value="pollo_entero">Pollo Entero</option>
+                                <option value="pavo_entero">Pavo Entero</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="weight" min="0.5" max="50" step="0.1" value="5" />
+                        </div>
+                        <div class="form-group">
+                            <label>Temperatura Ahumador (°C)</label>
+                            <input type="number" id="temp" min="50" max="150" step="1" value="110" />
+                        </div>
+                        <button onclick="window.bbqUI.calculateSmoke()">Calcular</button>
+                        <div id="smokeResult"></div>
+                    </div>
+                `;
+            },
+
+            renderTimerTab(container) {
+                container.innerHTML = `
+                    <div class="section">
+                        <h2>Cronómetro de Cocción en Vivo</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            Descarga una receta del tab de Ahumado para usar el cronómetro.
+                        </p>
+                        <button onclick="window.bbqUI.startTimer()">Iniciar Sesión</button>
+                        <div id="timerDisplay"></div>
+                    </div>
+                `;
+            },
+
+            renderCuringTab(container) {
+                container.innerHTML = `
+                    <div class="section">
+                        <h2>Calculadora de Curaciones</h2>
+                        <div class="form-group">
+                            <label>Tipo de Cura</label>
+                            <select id="cureType">
+                                <option value="bacon">Bacon</option>
+                                <option value="pastrami">Pastrami</option>
+                                <option value="corned_beef">Corned Beef</option>
+                                <option value="jerky">Jerky</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="cureWeight" min="0.5" max="50" step="0.1" value="2" />
+                        </div>
+                        <div class="form-group">
+                            <label>Espesor (cm)</label>
+                            <input type="number" id="cureThickness" min="1" max="20" step="0.5" value="5" />
+                        </div>
+                        <button onclick="window.bbqUI.calculateCure()">Calcular</button>
+                        <div id="cureResult"></div>
+                    </div>
+                `;
+            },
+
+            renderActiveCuresTab(container) {
+                container.innerHTML = `
+                    <div class="section">
+                        <h2>Curados Activos</h2>
+                        <div id="activeCuresList"></div>
+                    </div>
+                `;
+                this.updateActiveCuresList();
+            },
+
+            renderGadgetsTab(container) {
+                container.innerHTML = `
+                    <div class="section">
+                        <h2>Herramientas de Conversión</h2>
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="color: var(--accent); margin-bottom: 15px;">Temperatura</h3>
+                            <div class="form-group">
+                                <label>Celsius a Fahrenheit</label>
+                                <input type="number" id="tempC" value="100" placeholder="°C" />
+                                <p style="color: var(--text-muted); margin-top: 8px;" id="tempResult"></p>
+                                <button onclick="window.bbqUI.convertTemp()" style="margin-top: 10px;">Convertir</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--accent); margin-bottom: 15px;">Peso</h3>
+                            <div class="form-group">
+                                <label>Kilogramos a Libras</label>
+                                <input type="number" id="weightKg" value="1" placeholder="kg" />
+                                <p style="color: var(--text-muted); margin-top: 8px;" id="weightResult"></p>
+                                <button onclick="window.bbqUI.convertWeight()" style="margin-top: 10px;">Convertir</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            updateActiveCuresList() {
+                const cures = app.getActiveCures();
+                const container = document.getElementById('activeCuresList');
+
+                if (cures.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No hay curados activos</p>';
+                    return;
+                }
+
+                const html = cures.map(cure => `
+                    <div class="result">
+                        <h3>${cure.name}</h3>
+                        <div class="result-item">
+                            <span class="result-label">Tipo:</span>
+                            <span class="result-value">${cure.type}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Peso:</span>
+                            <span class="result-value">${cure.weightKg}kg</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Estado:</span>
+                            <span class="result-value">${cure.status}</span>
+                        </div>
+                        <button onclick="window.bbqUI.completeCure('${cure.id}')" style="margin-top: 15px; background: var(--success);">
+                            Completar
+                        </button>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            },
+
+            setupEventListeners() {
+                app.on('tab-changed', () => this.updateUI());
+                app.on('notification-shown', (notif) => this.showNotification(notif));
+            },
+
+            updateUI() {
+                // Actualizar según el tab actual
+                this.renderTabContent(app.getCurrentTab());
+            },
+
+            showNotification(notif) {
+                const div = document.createElement('div');
+                div.className = `notification ${notif.type}`;
+                div.textContent = notif.message;
+                document.body.appendChild(div);
+
+                setTimeout(() => {
+                    div.style.opacity = '0';
+                    setTimeout(() => div.remove(), 300);
+                }, notif.duration || 4000);
+            }
+        };
+
+        // Métodos de cálculo expuestos globalmente
+        window.bbqUI = ui;
+        window.bbqUI.calculateSmoke = function() {
+            try {
+                const result = app.calculateSmokingTime({
+                    meatType: document.getElementById('meatType').value,
+                    weight: parseFloat(document.getElementById('weight').value),
+                    temp: parseFloat(document.getElementById('temp').value)
+                });
+
+                const html = `
+                    <div class="result">
+                        <h3>Resultado del Cálculo</h3>
+                        <div class="result-item">
+                            <span class="result-label">Tiempo Total:</span>
+                            <span class="result-value">${Math.floor(result.totalMinutes / 60)}h ${result.totalMinutes % 60}m</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Temp. Interna Objetivo:</span>
+                            <span class="result-value">${result.internalTempC}°C</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Fases:</span>
+                            <span class="result-value">${result.phases.length}</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('smokeResult').innerHTML = html;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.bbqUI.calculateCure = function() {
+            try {
+                const result = app.calculateCure({
+                    cureType: document.getElementById('cureType').value,
+                    weightKg: parseFloat(document.getElementById('cureWeight').value),
+                    thickness: parseFloat(document.getElementById('cureThickness').value)
+                });
+
+                // Iniciar tracking
+                app.startCureTracking(result);
+
+                const html = `
+                    <div class="result">
+                        <h3>${result.name}</h3>
+                        <div class="result-item">
+                            <span class="result-label">Sal:</span>
+                            <span class="result-value">${Math.round(result.saltGrams)}g</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Azúcar:</span>
+                            <span class="result-value">${Math.round(result.sugarGrams)}g</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Tiempo Cura:</span>
+                            <span class="result-value">${result.cureDays} días</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('cureResult').innerHTML = html;
+                ui.updateActiveCuresList();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.bbqUI.completeCure = function(cureId) {
+            app.completeCure(cureId);
+            ui.updateActiveCuresList();
+        };
+
+        window.bbqUI.convertTemp = function() {
+            const value = parseFloat(document.getElementById('tempC').value);
+            const result = app.convertTemperature(value, 'C');
+            document.getElementById('tempResult').textContent =
+                `${result.fahrenheit.value}°F`;
+        };
+
+        window.bbqUI.convertWeight = function() {
+            const value = parseFloat(document.getElementById('weightKg').value);
+            const result = app.convertWeight(value, 'kg');
+            document.getElementById('weightResult').textContent =
+                `${result.lbs.value} lbs`;
+        };
+
+        window.bbqUI.startTimer = function() {
+            alert('Implementar cronómetro en siguiente versión');
+        };
+
+        // Inicializar aplicación
+        ui.init();
+    </script>
+</body>
+</html>
